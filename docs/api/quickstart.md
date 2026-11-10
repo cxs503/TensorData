@@ -2,7 +2,7 @@
 
 ## Status
 
-The current code is an early MVP: asset metadata registry and content-addressed artifact upload on local storage. It is not yet a production data lake, full governance engine, or migration-complete service.
+The current code is an early MVP: asset metadata registry and content-addressed artifact upload/retrieval on local storage. It is not yet a production data lake, full governance engine, or migration-complete service.
 
 ## Run locally
 
@@ -38,6 +38,7 @@ This initial API-key mechanism is suitable only for controlled development and t
 | GET | `/api/v1/assets/{asset_id}` | Read asset metadata |
 | POST | `/api/v1/assets/{asset_id}/artifacts` | Upload immutable content-addressed artifact |
 | GET | `/api/v1/assets/{asset_id}/artifacts` | List artifact metadata |
+| GET | `/api/v1/artifacts/{artifact_id}/content` | Retrieve artifact payload |
 
 Example asset registration:
 
@@ -63,7 +64,15 @@ curl -X POST 'http://localhost:8000/api/v1/assets/ASSET_ID/artifacts' \
   -F 'file=@observations.csv'
 ```
 
-The server computes SHA-256 and stores payloads under a digest-derived path. Duplicate payload bytes reuse the same content path. The original filename is metadata only and is never used to construct a storage path.
+Download using the artifact ID returned by the upload:
+
+```bash
+curl -L 'http://localhost:8000/api/v1/artifacts/ARTIFACT_ID/content' \
+  -H 'X-API-Key: replace-with-a-long-random-secret' \
+  -o observations.csv
+```
+
+The server computes SHA-256 and stores payloads under a digest-derived path. Duplicate payload bytes within the same asset reuse the artifact record; the same payload may be referenced by multiple assets. The original filename is metadata only and is never used to construct a storage path.
 
 ## Known limitations / next gates
 
@@ -72,5 +81,5 @@ The server computes SHA-256 and stores payloads under a digest-derived path. Dup
 - Asset lifecycle transitions and approval gates are not yet exposed.
 - Source registry, dataset manifests/versions, provenance, lineage and quality reports are not yet implemented.
 - Local filesystem storage is for development; S3-compatible backend and retention/garbage collection are future work.
-- The current upload handler enforces a configurable application-level size limit; production deployments also need proxy/server request limits and malware/content inspection.
-- Run automated tests and add CI before treating this service as deployable.
+- The upload handler enforces a configurable application-level size limit; production deployments also need proxy/server request limits and malware/content inspection.
+- CI has been added but must complete successfully before treating the service as deployable.
