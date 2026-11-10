@@ -32,7 +32,7 @@ class DataAsset(Base):
 
 class DataArtifact(Base):
     __tablename__ = "data_artifacts"
-    __table_args__ = (UniqueConstraint("sha256", name="uq_data_artifact_sha256"),)
+    __table_args__ = (UniqueConstraint("asset_id", "sha256", name="uq_asset_artifact_sha256"),)
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     asset_id: Mapped[str] = mapped_column(ForeignKey("data_assets.id", ondelete="CASCADE"), nullable=False, index=True)
