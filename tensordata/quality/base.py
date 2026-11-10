@@ -77,8 +77,8 @@ class RuleContext:
         """Stream-parse the payload as UTF-8 CSV once; reuse across rules.
 
         Duplicate detection digests each normalized row (JSON encoding, then
-        SHA-256) so memory stays bounded per row instead of holding the full
-        text of every distinct row.
+        SHA-256 truncated to 12 bytes) so memory stays bounded per row instead
+        of holding the full text of every distinct row.
         """
 
         if "csv" not in self._scans:
@@ -99,16 +99,19 @@ def _parse_csv(path: Path) -> CsvScan:
                 result.parse_error = str(exc)
                 result.parse_error_phase = "header"
                 return result
-            seen_row_digests: set[str] = set()
+            seen_row_digests: set[bytes] = set()
             for row in reader:
                 result.row_count += 1
                 if len(row) != len(result.headers):
                     result.malformed_rows += 1
                 normalized = tuple(value.strip() for value in row)
                 result.missing_cells += sum(1 for value in normalized if not value)
+                # 12-byte digest prefix: exact-duplicate semantics preserved
+                # (96-bit space, collision odds negligible at any realistic row
+                # count) while keeping per-row memory at ~1/3 of a hex string.
                 digest = sha256(
                     json.dumps(normalized, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-                ).hexdigest()
+                ).digest()[:12]
                 if digest in seen_row_digests:
                     result.duplicate_rows += 1
                 else:
