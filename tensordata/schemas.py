@@ -17,7 +17,8 @@ class AssetCreate(BaseModel):
     description: str | None = None
     owner: str = Field(min_length=1, max_length=255)
     source_ref: str | None = None
-    rights_status: Literal["unknown", "restricted", "review_required", "approved", "prohibited"] = "unknown"
+    # Approval is intentionally not accepted from an asset producer.
+    rights_status: Literal["unknown", "restricted", "review_required", "prohibited"] = "unknown"
     allowed_purposes: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
