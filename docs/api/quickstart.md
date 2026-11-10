@@ -13,6 +13,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
 export TENSORDATA_API_KEY='replace-with-a-long-random-secret'
+alembic upgrade head
 uvicorn tensordata.main:app --reload
 ```
 
@@ -20,7 +21,7 @@ Health: `GET http://localhost:8000/health`
 
 Interactive API documentation: `http://localhost:8000/docs`
 
-By default metadata uses `./data/tensordata.db` and artifact payloads use `./data/artifacts`. Configure `TENSORDATA_DATABASE_URL`, `TENSORDATA_STORAGE_ROOT`, and `TENSORDATA_MAX_UPLOAD_BYTES` for other environments. Keep the API key out of source control.
+By default metadata uses `./data/tensordata.db` and artifact payloads use `./data/artifacts`. Local quickstart keeps `TENSORDATA_AUTO_CREATE_SCHEMA=true` for backwards-compatible convenience; set it to `false` when migrations are the sole schema authority. Configure `TENSORDATA_DATABASE_URL`, `TENSORDATA_STORAGE_ROOT`, and `TENSORDATA_MAX_UPLOAD_BYTES` for other environments. Keep the API key out of source control.
 
 ## Authentication
 
@@ -137,7 +138,7 @@ The server computes SHA-256 and stores payloads under a digest-derived path. Dup
 
 ## Known limitations / next gates
 
-- Database schema currently uses SQLAlchemy metadata creation; Alembic migrations are not yet implemented.
+- An initial Alembic migration and downgrade path are implemented. Future model changes must be added as reviewed migrations; do not rely on `create_all` to evolve an existing database.
 - The API key is a single shared secret, not user/service identity or resource-scoped authorization.
 - Asset lifecycle transitions and approval gates are not yet exposed.
 - Source registry, evidence-backed rights approval, executable quality reports and verified lineage graph are not yet implemented.
