@@ -62,3 +62,15 @@ Minimum controls:
 - Keep raw evidence and rights evidence immutable and checksummed. If terms change or permission is revoked, withdraw or re-evaluate affected dataset versions.
 
 The repository's manifest validator is a minimum structural gate, not a legal opinion or a substitute for human rights review. See `rights/README.md` and `scripts/check_rights_manifests.py`.
+
+## Agent production and accountable review
+
+TensorData operates in a single-human-maintainer environment with multiple agents. Agents may collect, transform, annotate, validate and assemble assets, but they cannot grant rights, attest to human consent, or approve their own rights status.
+
+- Material agent-produced assets and transformations must record agent/tool identity, model and run metadata where available, task/work-package reference, source lineage, verification evidence and the accountable human maintainer.
+- Use the `actor` object in `POST /api/v1/provenance`; see [Agent Execution Provenance](AGENT_PROVENANCE.md). Legacy requests without actor metadata remain marked as unattributed.
+- Agent reviewer IDs and test evidence are quality signals, not legal clearance or human approval.
+- Rights approval must be separate from asset creation and must reference evidence and an authorized reviewer. An asset producer cannot self-approve.
+- R0/R1 routine work can be handled through automated checks, agent verification and periodic sampling. Material or critical rights, privacy, customer-data, commercial-use and external-release decisions require the human maintainer.
+- Never fabricate model versions, run IDs, rights holders, license expressions, signatures or approval evidence. Use explicit unknown values.
+
