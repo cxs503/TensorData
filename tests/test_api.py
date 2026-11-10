@@ -117,6 +117,34 @@ def test_asset_dataset_version_and_provenance_lifecycle(monkeypatch):
             assert version["manifest_json"]["members"][0]["rights_status_at_snapshot"] == "review_required"
             assert version["manifest_json"]["members"][0]["lifecycle_state_at_snapshot"] == "quarantine"
 
+            prohibited_asset_response = client.post("/api/v1/assets", headers=headers, json={
+                "name": f"restricted ship source {uuid4()}",
+                "asset_type": "document",
+                "owner": "external-source",
+                "rights_status": "prohibited",
+            })
+            assert prohibited_asset_response.status_code == 201
+            prohibited_asset = prohibited_asset_response.json()
+            prohibited_upload = client.post(
+                f"/api/v1/assets/{prohibited_asset['id']}/artifacts",
+                headers=headers,
+                files={"file": ("prohibited.txt", b"do not redistribute", "text/plain")},
+            )
+            assert prohibited_upload.status_code == 201
+            prohibited_version = client.post(
+                f"/api/v1/datasets/{dataset['id']}/versions",
+                headers=headers,
+                json={
+                    **version_payload,
+                    "version": "1.0.1",
+                    "members": [
+                        {"artifact_id": artifact["id"]},
+                        {"artifact_id": prohibited_upload.json()["id"]},
+                    ],
+                },
+            )
+            assert prohibited_version.status_code == 422
+
             duplicate_version = client.post(
                 f"/api/v1/datasets/{dataset['id']}/versions",
                 headers=headers,
