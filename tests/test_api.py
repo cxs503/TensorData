@@ -169,6 +169,8 @@ def test_asset_dataset_version_and_provenance_lifecycle(monkeypatch):
             assert version["manifest_json"]["members"][0]["artifact_sha256"] == artifact["sha256"]
             assert version["manifest_json"]["members"][0]["rights_status_at_snapshot"] == "review_required"
             assert version["manifest_json"]["members"][0]["lifecycle_state_at_snapshot"] == "quarantine"
+            assert version["manifest_json"]["members"][0]["quality_report_id"] == quality_report["id"]
+            assert version["manifest_json"]["members"][0]["quality_ruleset_version"] == "0.1.0"
 
             prohibited_asset_response = client.post("/api/v1/assets", headers=headers, json={
                 "name": f"restricted ship source {uuid4()}",
@@ -223,6 +225,14 @@ def test_asset_dataset_version_and_provenance_lifecycle(monkeypatch):
             assert listed_versions.status_code == 200
             assert [item["version"] for item in listed_versions.json()] == ["1.0.0"]
 
+            invalid_provenance = client.post("/api/v1/provenance", headers=headers, json={
+                "activity_type": "invalid_transform",
+                "inputs": [{"artifact_id": str(uuid4())}],
+                "outputs": [{"artifact_id": artifact["id"]}],
+                "responsible_actor": "test-agent",
+            })
+            assert invalid_provenance.status_code == 422
+
             provenance_response = client.post("/api/v1/provenance", headers=headers, json={
                 "activity_type": "csv_ingestion",
                 "inputs": [{"uri": "source://ship/sensor-01"}],
@@ -242,5 +252,14 @@ def test_asset_dataset_version_and_provenance_lifecycle(monkeypatch):
             )
             assert provenance_list.status_code == 200
             assert any(item["id"] == provenance["id"] for item in provenance_list.json())
+
+            lineage = client.get(
+                f"/api/v1/lineage/artifacts/{artifact['id']}",
+                headers=headers,
+            )
+            assert lineage.status_code == 200
+            assert lineage.json()["target_artifact_id"] == artifact["id"]
+            assert any(item["id"] == provenance["id"] for item in lineage.json()["activities"])
+
     finally:
         get_settings.cache_clear()
