@@ -24,6 +24,6 @@ def test_initial_migration_upgrade_and_downgrade(tmp_path, monkeypatch):
         }.issubset(table_names)
 
         command.downgrade(config, "base")
-        assert inspect(engine).get_table_names() == []
+        assert inspect(engine).get_table_names() == ["alembic_version"]
     finally:
         engine.dispose()
