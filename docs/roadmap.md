@@ -16,7 +16,7 @@
 - [x] Basic DataAsset registration and catalog read APIs
 - [x] DataArtifact upload, listing and content retrieval
 - [x] API-key gate for all asset APIs
-- [ ] Alembic schema migrations
+- [x] Alembic baseline migration with upgrade/downgrade support
 - [ ] Full DataAsset/DataArtifact lifecycle and update/delete policy
 - [x] Dataset registry API
 - [x] Immutable DatasetVersion manifest API with content checksum
@@ -60,4 +60,4 @@ Dataset versions snapshot artifact IDs, content hashes, roles, selectors, rights
 
 The current provenance endpoint records declared activity inputs, outputs, parameters, responsible actor and optional code/environment digests. It is not yet a verified W3C PROV implementation: referenced entities are not all validated and graph traversal is not implemented.
 
-The service remains an early development baseline. SQLAlchemy metadata create_all is still used for local schema creation; do not deploy schema changes to a shared production database until Alembic migrations, authorization hardening and a fully green CI gate are in place.
+The service remains an early development baseline. Alembic now owns the initial schema baseline. Local development retains opt-in-by-default `create_all` for compatibility; the Docker image disables automatic schema creation and applies migrations before startup. Production readiness still requires migration testing against the target database, authorization hardening and operational validation.
