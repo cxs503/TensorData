@@ -1,9 +1,9 @@
+import os
 from contextlib import asynccontextmanager
 from hashlib import sha256
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 from uuid import uuid4
-import os
 
 from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
@@ -27,7 +27,6 @@ app = FastAPI(
     title="TensorData API",
     version="0.1.0",
     description="Governed data-asset registry and artifact service.",
-    lifespan=lifespan,
 )
 
 
@@ -39,13 +38,22 @@ def require_api_key(x_api_key: str | None = Header(default=None)) -> None:
         raise HTTPException(status_code=401, detail="Invalid or missing API key")
 
 
+DB_DEPENDENCY = Depends(get_db)
+AUTH_DEPENDENCY = Depends(require_api_key)
+UPLOAD_FILE = File(...)
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "tensordata", "version": app.version}
 
 
 @app.post("/api/v1/assets", response_model=AssetRead, status_code=status.HTTP_201_CREATED)
-def create_asset(payload: AssetCreate, _: None = Depends(require_api_key), db: Session = Depends(get_db)):
+def create_asset(
+    payload: AssetCreate,
+    _: None = AUTH_DEPENDENCY,
+    db: Session = DB_DEPENDENCY,
+):
     asset = DataAsset(
         name=payload.name,
         asset_type=payload.asset_type,
@@ -61,13 +69,13 @@ def create_asset(payload: AssetCreate, _: None = Depends(require_api_key), db: S
     return asset
 
 
-@app.get("/api/v1/assets", response_model=list[AssetRead], dependencies=[Depends(require_api_key)])
+@app.get("/api/v1/assets", response_model=list[AssetRead], dependencies=[AUTH_DEPENDENCY])
 def list_assets(
     asset_type: str | None = None,
     lifecycle_state: str | None = None,
     limit: int = 100,
     offset: int = 0,
-    db: Session = Depends(get_db),
+    db: Session = DB_DEPENDENCY,
 ):
     if limit < 1 or limit > 500 or offset < 0:
         raise HTTPException(status_code=422, detail="limit must be 1..500 and offset >= 0")
@@ -79,21 +87,25 @@ def list_assets(
     return list(db.scalars(query).all())
 
 
-@app.get("/api/v1/assets/{asset_id}", response_model=AssetRead, dependencies=[Depends(require_api_key)])
-def get_asset(asset_id: str, db: Session = Depends(get_db)):
+@app.get("/api/v1/assets/{asset_id}", response_model=AssetRead, dependencies=[AUTH_DEPENDENCY])
+def get_asset(asset_id: str, db: Session = DB_DEPENDENCY):
     asset = db.get(DataAsset, asset_id)
     if asset is None:
         raise HTTPException(status_code=404, detail="Asset not found")
     return asset
 
 
-@app.post("/api/v1/assets/{asset_id}/artifacts", response_model=ArtifactRead, status_code=status.HTTP_201_CREATED)
+@app.post(
+    "/api/v1/assets/{asset_id}/artifacts",
+    response_model=ArtifactRead,
+    status_code=status.HTTP_201_CREATED,
+)
 async def upload_artifact(
     asset_id: str,
-    file: UploadFile = File(...),
+    file: UploadFile = UPLOAD_FILE,
     role: str = "raw",
-    _: None = Depends(require_api_key),
-    db: Session = Depends(get_db),
+    _: None = AUTH_DEPENDENCY,
+    db: Session = DB_DEPENDENCY,
 ):
     asset = db.get(DataAsset, asset_id)
     if asset is None:
@@ -114,10 +126,12 @@ async def upload_artifact(
                 out.write(chunk)
         checksum = digest.hexdigest()
 
-        existing = db.scalar(select(DataArtifact).where(
-            DataArtifact.asset_id == asset_id,
-            DataArtifact.sha256 == checksum,
-        ))
+        existing = db.scalar(
+            select(DataArtifact).where(
+                DataArtifact.asset_id == asset_id,
+                DataArtifact.sha256 == checksum,
+            )
+        )
         if existing is not None:
             temp_path.unlink(missing_ok=True)
             return existing
@@ -149,15 +163,25 @@ async def upload_artifact(
         await file.close()
 
 
-@app.get("/api/v1/assets/{asset_id}/artifacts", response_model=list[ArtifactRead], dependencies=[Depends(require_api_key)])
-def list_artifacts(asset_id: str, db: Session = Depends(get_db)):
+@app.get(
+    "/api/v1/assets/{asset_id}/artifacts",
+    response_model=list[ArtifactRead],
+    dependencies=[AUTH_DEPENDENCY],
+)
+def list_artifacts(asset_id: str, db: Session = DB_DEPENDENCY):
     if db.get(DataAsset, asset_id) is None:
         raise HTTPException(status_code=404, detail="Asset not found")
-    return list(db.scalars(select(DataArtifact).where(DataArtifact.asset_id == asset_id).order_by(DataArtifact.created_at)).all())
+    return list(
+        db.scalars(
+            select(DataArtifact)
+            .where(DataArtifact.asset_id == asset_id)
+            .order_by(DataArtifact.created_at)
+        ).all()
+    )
 
 
-@app.get("/api/v1/artifacts/{artifact_id}/content", dependencies=[Depends(require_api_key)])
-def download_artifact(artifact_id: str, db: Session = Depends(get_db)):
+@app.get("/api/v1/artifacts/{artifact_id}/content", dependencies=[AUTH_DEPENDENCY])
+def download_artifact(artifact_id: str, db: Session = DB_DEPENDENCY):
     artifact = db.get(DataArtifact, artifact_id)
     if artifact is None:
         raise HTTPException(status_code=404, detail="Artifact not found")
