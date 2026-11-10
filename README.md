@@ -40,6 +40,7 @@ These systems integrate through explicit APIs and stable identifiers. They must 
 
 An early development service now includes:
 - FastAPI service and health endpoint
+- Synchronous Python SDK for Agent-side asset, upload, quality, dataset, provenance and lineage workflows
 - Asset metadata registration and catalog listing
 - API-key gate for all data APIs
 - Local content-addressed artifact upload/retrieval with SHA-256 metadata
