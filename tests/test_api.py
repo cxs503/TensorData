@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from fastapi.testclient import TestClient
 
 from tensordata.main import app
@@ -26,7 +28,7 @@ def test_api_is_closed_without_key(monkeypatch):
         get_settings.cache_clear()
 
 
-def test_asset_and_artifact_lifecycle(monkeypatch):
+def test_asset_dataset_version_and_provenance_lifecycle(monkeypatch):
     monkeypatch.setenv("TENSORDATA_API_KEY", "test-secret")
     from tensordata.config import get_settings
     get_settings.cache_clear()
@@ -34,7 +36,7 @@ def test_asset_and_artifact_lifecycle(monkeypatch):
         with TestClient(app) as client:
             headers = {"X-API-Key": "test-secret"}
             created = client.post("/api/v1/assets", headers=headers, json={
-                "name": "ship motion sample",
+                "name": f"ship motion sample {uuid4()}",
                 "asset_type": "timeseries",
                 "owner": "tensor-physics",
                 "rights_status": "review_required",
@@ -85,5 +87,79 @@ def test_asset_and_artifact_lifecycle(monkeypatch):
             assert downloaded.status_code == 200
             assert downloaded.content == payload
             assert downloaded.headers["x-content-sha256"] == artifact["sha256"]
+
+            dataset_response = client.post("/api/v1/datasets", headers=headers, json={
+                "name": f"ship-motion-training-{uuid4()}",
+                "description": "Initial ship motion dataset",
+                "owner": "tensor-physics",
+                "intended_uses": ["research", "model_training"],
+            })
+            assert dataset_response.status_code == 201
+            dataset = dataset_response.json()
+
+            version_payload = {
+                "version": "1.0.0",
+                "members": [{"artifact_id": artifact["id"], "role": "observations"}],
+                "split_definition": {"strategy": "not_yet_split"},
+                "schema_refs": ["ship-motion-timeseries/v1"],
+                "transform_refs": [],
+                "created_by": "test-agent",
+            }
+            version_response = client.post(
+                f"/api/v1/datasets/{dataset['id']}/versions",
+                headers=headers,
+                json=version_payload,
+            )
+            assert version_response.status_code == 201
+            version = version_response.json()
+            assert len(version["manifest_sha256"]) == 64
+            assert version["manifest_json"]["members"][0]["artifact_sha256"] == artifact["sha256"]
+            assert version["manifest_json"]["members"][0]["rights_status_at_snapshot"] == "review_required"
+            assert version["manifest_json"]["members"][0]["lifecycle_state_at_snapshot"] == "quarantine"
+
+            duplicate_version = client.post(
+                f"/api/v1/datasets/{dataset['id']}/versions",
+                headers=headers,
+                json=version_payload,
+            )
+            assert duplicate_version.status_code == 409
+
+            unknown_artifact = client.post(
+                f"/api/v1/datasets/{dataset['id']}/versions",
+                headers=headers,
+                json={
+                    **version_payload,
+                    "version": "1.0.1",
+                    "members": [{"artifact_id": str(uuid4())}],
+                },
+            )
+            assert unknown_artifact.status_code == 422
+
+            listed_versions = client.get(
+                f"/api/v1/datasets/{dataset['id']}/versions",
+                headers=headers,
+            )
+            assert listed_versions.status_code == 200
+            assert [item["version"] for item in listed_versions.json()] == ["1.0.0"]
+
+            provenance_response = client.post("/api/v1/provenance", headers=headers, json={
+                "activity_type": "csv_ingestion",
+                "inputs": [{"uri": "source://ship/sensor-01"}],
+                "outputs": [{"artifact_id": artifact["id"], "sha256": artifact["sha256"]}],
+                "parameters": {"parser": "csv", "encoding": "utf-8"},
+                "responsible_actor": "tensor-data-agent",
+                "code_digest": "git:abc123",
+                "environment_digest": "container:sha256-example",
+            })
+            assert provenance_response.status_code == 201
+            provenance = provenance_response.json()
+            assert provenance["outputs_json"][0]["artifact_id"] == artifact["id"]
+
+            provenance_list = client.get(
+                "/api/v1/provenance?activity_type=csv_ingestion",
+                headers=headers,
+            )
+            assert provenance_list.status_code == 200
+            assert any(item["id"] == provenance["id"] for item in provenance_list.json())
     finally:
         get_settings.cache_clear()
