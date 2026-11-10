@@ -111,6 +111,15 @@ async def upload_artifact(
                 digest.update(chunk)
                 out.write(chunk)
         checksum = digest.hexdigest()
+
+        existing = db.scalar(select(DataArtifact).where(
+            DataArtifact.asset_id == asset_id,
+            DataArtifact.sha256 == checksum,
+        ))
+        if existing is not None:
+            temp_path.unlink(missing_ok=True)
+            return existing
+
         destination = root / checksum[:2] / checksum
         destination.parent.mkdir(parents=True, exist_ok=True)
         if destination.exists():
