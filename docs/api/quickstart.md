@@ -2,7 +2,7 @@
 
 ## Status
 
-The current code is an early MVP: asset metadata registry and content-addressed artifact upload/retrieval on local storage. It is not yet a production data lake, full governance engine, or migration-complete service.
+The current code is an early MVP: asset metadata registry, content-addressed artifact upload/retrieval, dataset registry, immutable dataset-version manifests and append-only provenance activity records. It is not yet a production data lake or complete governance engine.
 
 ## Run locally
 
@@ -39,6 +39,67 @@ This initial API-key mechanism is suitable only for controlled development and t
 | POST | `/api/v1/assets/{asset_id}/artifacts` | Upload immutable content-addressed artifact |
 | GET | `/api/v1/assets/{asset_id}/artifacts` | List artifact metadata |
 | GET | `/api/v1/artifacts/{artifact_id}/content` | Retrieve artifact payload |
+| POST | `/api/v1/datasets` | Create a logical dataset |
+| GET | `/api/v1/datasets` | List datasets |
+| POST | `/api/v1/datasets/{dataset_id}/versions` | Create an immutable dataset version |
+| GET | `/api/v1/datasets/{dataset_id}/versions` | List dataset versions |
+| GET | `/api/v1/datasets/{dataset_id}/versions/{version}` | Resolve a version manifest |
+| POST | `/api/v1/provenance` | Record a processing/production activity |
+| GET | `/api/v1/provenance` | List/filter activity records |
+
+## Dataset version example
+
+Create a logical dataset:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/datasets \
+  -H 'X-API-Key: replace-with-a-long-random-secret' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "ship-motion-training",
+    "owner": "tensor-physics",
+    "intended_uses": ["research", "model_training"]
+  }'
+```
+
+Create an immutable version using one or more artifact IDs returned by artifact upload:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/datasets/DATASET_ID/versions \
+  -H 'X-API-Key: replace-with-a-long-random-secret' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "version": "1.0.0",
+    "members": [{"artifact_id": "ARTIFACT_ID", "role": "observations"}],
+    "split_definition": {"strategy": "not_yet_split"},
+    "schema_refs": ["ship-motion-timeseries/v1"],
+    "transform_refs": [],
+    "created_by": "tensor-data-agent"
+  }'
+```
+
+The response includes a canonical manifest and its SHA-256 checksum. The manifest snapshots each member's artifact checksum, size, media type, role, selector, and asset rights/lifecycle state at creation time. Reusing the same dataset/version pair returns HTTP 409; create a new version instead of mutating an existing one.
+
+## Provenance example
+
+```bash
+curl -X POST http://localhost:8000/api/v1/provenance \
+  -H 'X-API-Key: replace-with-a-long-random-secret' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "activity_type": "simulation_export",
+    "inputs": [{"asset_id": "INPUT_ASSET_ID"}],
+    "outputs": [{"artifact_id": "OUTPUT_ARTIFACT_ID"}],
+    "parameters": {"solver": "TensorLBM"},
+    "responsible_actor": "simulation-agent",
+    "code_digest": "git:COMMIT",
+    "environment_digest": "container:DIGEST"
+  }'
+```
+
+The provenance API stores declared activity evidence. It does not yet validate every referenced entity or provide lineage graph traversal.
+
+## Asset upload and retrieval
 
 Example asset registration:
 
@@ -79,7 +140,9 @@ The server computes SHA-256 and stores payloads under a digest-derived path. Dup
 - Database schema currently uses SQLAlchemy metadata creation; Alembic migrations are not yet implemented.
 - The API key is a single shared secret, not user/service identity or resource-scoped authorization.
 - Asset lifecycle transitions and approval gates are not yet exposed.
-- Source registry, dataset manifests/versions, provenance, lineage and quality reports are not yet implemented.
+- Source registry, evidence-backed rights approval, executable quality reports and verified lineage graph are not yet implemented.
+- Dataset manifest references (schema/transform IDs) are currently recorded as declared identifiers, not yet resolved against registries.
+- Dataset versions currently permit snapshots of quarantined or rights-review-required assets; this records state but does not authorize training or publication.
 - Local filesystem storage is for development; S3-compatible backend and retention/garbage collection are future work.
 - The upload handler enforces a configurable application-level size limit; production deployments also need proxy/server request limits and malware/content inspection.
-- CI has been added but must complete successfully before treating the service as deployable.
+- CI must complete successfully before treating the service as deployable.
