@@ -3,7 +3,6 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
 AssetType = Literal[
     "document", "table", "image", "audio", "video", "timeseries", "spatial",
     "point_cloud", "mesh", "scientific_field", "knowledge_bundle", "agent_trace",
