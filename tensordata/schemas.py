@@ -120,3 +120,23 @@ class ProvenanceRead(BaseModel):
     code_digest: str | None
     environment_digest: str | None
     created_at: datetime
+
+
+class QualityCheckCreate(BaseModel):
+    profile: Literal["general", "tabular"] = "general"
+    executed_by: str = Field(min_length=1, max_length=255)
+
+
+class QualityReportRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    artifact_id: str
+    artifact_sha256: str
+    profile: str
+    ruleset_version: str
+    status: str
+    summary_json: dict[str, Any]
+    findings_json: list[dict[str, Any]]
+    executed_by: str
+    created_at: datetime
