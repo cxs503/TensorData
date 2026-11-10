@@ -61,3 +61,7 @@ An early development service now includes:
 Schema migrations are managed with Alembic. Local quickstart mode retains automatic table creation for convenience; production containers disable it and run `alembic upgrade head` before starting the API.
 
 See [Local quickstart](docs/api/quickstart.md). Do not commit secrets, real restricted data, or generated datasets to this repository.
+
+## License
+
+See [LICENSE](LICENSE) for the software license and [LICENSE_SCOPE.md](LICENSE_SCOPE.md) for the boundary between project software and third-party or content assets. Dataset, paper, model, customer, and other non-software assets retain their own rights and restrictions.
