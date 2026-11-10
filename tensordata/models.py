@@ -87,3 +87,18 @@ class ProvenanceRecord(Base):
     code_digest: Mapped[str | None] = mapped_column(String(128))
     environment_digest: Mapped[str | None] = mapped_column(String(128))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class QualityReport(Base):
+    __tablename__ = "quality_reports"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    artifact_id: Mapped[str] = mapped_column(ForeignKey("data_artifacts.id", ondelete="CASCADE"), nullable=False, index=True)
+    artifact_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    profile: Mapped[str] = mapped_column(String(64), nullable=False)
+    ruleset_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, index=True)
+    summary_json: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    findings_json: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    executed_by: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
