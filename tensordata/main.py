@@ -1,10 +1,12 @@
 from contextlib import asynccontextmanager
 from hashlib import sha256
 from pathlib import Path
+from urllib.parse import unquote, urlparse
 from uuid import uuid4
 import os
 
 from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile, status
+from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -152,3 +154,25 @@ def list_artifacts(asset_id: str, db: Session = Depends(get_db)):
     if db.get(DataAsset, asset_id) is None:
         raise HTTPException(status_code=404, detail="Asset not found")
     return list(db.scalars(select(DataArtifact).where(DataArtifact.asset_id == asset_id).order_by(DataArtifact.created_at)).all())
+
+
+@app.get("/api/v1/artifacts/{artifact_id}/content", dependencies=[Depends(require_api_key)])
+def download_artifact(artifact_id: str, db: Session = Depends(get_db)):
+    artifact = db.get(DataArtifact, artifact_id)
+    if artifact is None:
+        raise HTTPException(status_code=404, detail="Artifact not found")
+
+    parsed = urlparse(artifact.storage_uri)
+    if parsed.scheme != "file":
+        raise HTTPException(status_code=501, detail="This storage backend cannot serve local downloads")
+    payload_path = Path(unquote(parsed.path)).resolve()
+    storage_root = get_settings().storage_root.resolve()
+    if not payload_path.is_relative_to(storage_root) or not payload_path.is_file():
+        raise HTTPException(status_code=404, detail="Artifact payload is missing")
+
+    return FileResponse(
+        payload_path,
+        media_type=artifact.media_type,
+        filename=artifact.filename,
+        headers={"ETag": f'"{artifact.sha256}"', "X-Content-SHA256": artifact.sha256},
+    )
