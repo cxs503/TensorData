@@ -14,7 +14,14 @@ from sqlalchemy.orm import Session
 
 from .config import get_settings
 from .db import Base, engine, get_db
-from .models import DataArtifact, DataAsset, Dataset, DatasetVersion, ProvenanceRecord, QualityReport
+from .models import (
+    DataArtifact,
+    DataAsset,
+    Dataset,
+    DatasetVersion,
+    ProvenanceRecord,
+    QualityReport,
+)
 from .schemas import (
     ArtifactRead,
     AssetCreate,
