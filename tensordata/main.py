@@ -485,11 +485,22 @@ def create_provenance(
                     detail=f"Artifact checksum mismatch for {referenced_artifact_id}",
                 )
 
+    if "_actor_provenance" in payload.parameters:
+        raise HTTPException(
+            status_code=422,
+            detail="'_actor_provenance' is reserved for server-recorded actor metadata",
+        )
+
+    actor_metadata = (
+        payload.actor.model_dump(exclude_none=True)
+        if payload.actor is not None
+        else {"actor_type": "unknown", "attribution_status": "legacy_unattributed"}
+    )
     record = ProvenanceRecord(
         activity_type=payload.activity_type,
         inputs_json=payload.inputs,
         outputs_json=payload.outputs,
-        parameters_json=payload.parameters,
+        parameters_json={**payload.parameters, "_actor_provenance": actor_metadata},
         responsible_actor=payload.responsible_actor,
         code_digest=payload.code_digest,
         environment_digest=payload.environment_digest,
