@@ -1,0 +1,37 @@
+{
+  "manifest_version": "tensordata.asset-rights.v1",
+  "asset_id": "REPLACE-WITH-STABLE-ASSET-ID",
+  "asset_type": "dataset",
+  "asset_version": "0.1.0",
+  "source": {
+    "source_type": "other",
+    "title": "REPLACE: source title",
+    "uri": "REPLACE: source URL or controlled evidence reference",
+    "acquired_at": "2026-11-10T00:00:00Z",
+    "acquisition_method": "REPLACE: describe acquisition method",
+    "acquired_by": "REPLACE: accountable actor"
+  },
+  "rights": {
+    "status": "unknown",
+    "license_expression": "NOASSERTION",
+    "rights_holder": "unknown",
+    "attribution": "",
+    "permitted_purposes": [],
+    "prohibited_purposes": [],
+    "redistribution": "unknown",
+    "commercial_use": "unknown",
+    "model_training": "unknown",
+    "restrictions": [
+      "Template only. Replace all placeholders and keep quarantined until rights evidence is reviewed."
+    ]
+  },
+  "provenance": {
+    "parent_asset_ids": [],
+    "transformations": []
+  },
+  "review": {
+    "status": "not_reviewed",
+    "decision_scope": []
+  },
+  "notes": "EXAMPLE TEMPLATE ONLY — not an approved asset."
+}
