@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 AssetType = Literal[
     "document", "table", "image", "audio", "video", "timeseries", "spatial",
@@ -98,12 +98,44 @@ class DatasetVersionRead(BaseModel):
     created_at: datetime
 
 
+class ActorProvenance(BaseModel):
+    """Machine-readable identity metadata for a provenance-producing actor."""
+
+    actor_type: Literal["human", "agent", "system", "unknown"] = "unknown"
+    actor_id: str | None = Field(default=None, max_length=255)
+    role: str | None = Field(default=None, max_length=128)
+    tool_name: str | None = Field(default=None, max_length=255)
+    tool_version: str | None = Field(default=None, max_length=128)
+    model_id: str | None = Field(default=None, max_length=255)
+    run_id: str | None = Field(default=None, max_length=255)
+    work_package: str | None = Field(default=None, max_length=255)
+    accountable_human: str | None = Field(default=None, max_length=255)
+    reviewer_agent_ids: list[str] = Field(default_factory=list)
+    verification_refs: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def require_agent_attribution(self):
+        if self.actor_type == "agent":
+            required = {
+                "actor_id": self.actor_id,
+                "tool_name": self.tool_name,
+                "accountable_human": self.accountable_human,
+            }
+            missing = [key for key, value in required.items() if not value or not value.strip()]
+            if missing:
+                raise ValueError(
+                    "agent provenance requires non-empty fields: " + ", ".join(missing)
+                )
+        return self
+
+
 class ProvenanceCreate(BaseModel):
     activity_type: str = Field(min_length=1, max_length=128)
     inputs: list[dict[str, Any]] = Field(default_factory=list)
     outputs: list[dict[str, Any]] = Field(min_length=1)
     parameters: dict[str, Any] = Field(default_factory=dict)
     responsible_actor: str = Field(min_length=1, max_length=255)
+    actor: ActorProvenance | None = None
     code_digest: str | None = Field(default=None, max_length=128)
     environment_digest: str | None = Field(default=None, max_length=128)
 
