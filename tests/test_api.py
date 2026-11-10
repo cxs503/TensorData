@@ -49,15 +49,32 @@ def test_asset_and_artifact_lifecycle(monkeypatch):
             assert listed.status_code == 200
             assert any(item["id"] == asset["id"] for item in listed.json())
 
+            payload = b"time,speed\n0,2.1\n1,2.4\n"
             uploaded = client.post(
                 f"/api/v1/assets/{asset['id']}/artifacts",
                 headers=headers,
-                files={"file": ("sample.csv", b"time,speed\n0,2.1\n1,2.4\n", "text/csv")},
+                files={"file": ("sample.csv", payload, "text/csv")},
             )
             assert uploaded.status_code == 201
             artifact = uploaded.json()
             assert artifact["asset_id"] == asset["id"]
             assert len(artifact["sha256"]) == 64
-            assert artifact["size_bytes"] > 0
+            assert artifact["size_bytes"] == len(payload)
+
+            repeated = client.post(
+                f"/api/v1/assets/{asset['id']}/artifacts",
+                headers=headers,
+                files={"file": ("renamed.csv", payload, "text/csv")},
+            )
+            assert repeated.status_code == 201
+            assert repeated.json()["id"] == artifact["id"]
+
+            downloaded = client.get(
+                f"/api/v1/artifacts/{artifact['id']}/content",
+                headers=headers,
+            )
+            assert downloaded.status_code == 200
+            assert downloaded.content == payload
+            assert downloaded.headers["x-content-sha256"] == artifact["sha256"]
     finally:
         get_settings.cache_clear()
