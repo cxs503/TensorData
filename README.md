@@ -26,12 +26,13 @@ These systems integrate through explicit APIs and stable identifiers. They must 
 9. **Open interfaces:** prefer interoperable formats and APIs; avoid unnecessary infrastructure duplication.
 10. **Agent-operated, human-governed:** agents may produce and review assets, while high-impact releases require independent checks and explicit policy.
 
-## Architecture documents
+## Architecture and migration
 
 - [Architecture overview](docs/architecture/overview.md)
 - [Data asset model](docs/architecture/data-asset-model.md)
 - [Governance and quality](docs/governance/data-governance.md)
 - [TensorPlatform migration plan](docs/migration/tensorplatform-migration.md)
+- [Initial TensorPlatform capability audit](docs/migration/tensorplatform-inventory-initial.md)
 - [Roadmap](docs/roadmap.md)
 - [Local quickstart and API contract](docs/api/quickstart.md)
 
@@ -41,10 +42,10 @@ An early MVP service exists:
 - FastAPI service with health endpoint
 - Asset metadata registration and catalog listing
 - API-key gate for all asset APIs
-- Local content-addressed artifact upload with SHA-256 metadata
-- Initial API tests
+- Local content-addressed artifact upload and retrieval with SHA-256 metadata
+- Initial API tests and GitHub Actions test/lint workflow
 
-**Not production-ready:** dataset versioning, provenance/lineage, executable quality gates, source/rights registry, Alembic migrations, scoped identity/authorization, S3-compatible storage, CI execution and deployment hardening remain future gates. The current service must be treated as an early development baseline, not a complete data platform.
+**Not production-ready:** dataset versioning, provenance/lineage, executable quality gates, source/rights registry, Alembic migrations, scoped identity/authorization, S3-compatible storage, successful CI evidence and deployment hardening remain future gates. The current service is an early development baseline, not a complete data platform.
 
 ## Development
 
