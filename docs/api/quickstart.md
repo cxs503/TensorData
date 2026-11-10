@@ -168,3 +168,15 @@ curl "$TENSORDATA_URL/api/v1/artifacts/$ARTIFACT_ID/quality-reports" \
 ```
 
 Dataset version creation requires a passing report whose recorded SHA-256 matches the artifact's current checksum. The tabular profile currently reports missing cells and duplicate rows as warnings; empty/malformed files, inconsistent row widths and integrity mismatches fail the report. Domain-specific physical and multimodal validators are not yet included.
+
+
+## Provenance and lineage
+
+Provenance activity creation validates any supplied `artifact_id` references against registered artifacts and rejects mismatched supplied SHA-256 values. External source references may be represented without an artifact ID. Query the connected activity graph for an artifact:
+
+```bash
+curl "$TENSORDATA_URL/api/v1/lineage/artifacts/$ARTIFACT_ID" \
+  -H "X-API-Key: $TENSORDATA_API_KEY"
+```
+
+The response includes connected artifact nodes, provenance activities, and external input references. This initial graph is not yet a full W3C PROV implementation.
