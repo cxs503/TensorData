@@ -45,3 +45,20 @@ Enforce least privilege, purpose limitation, access audit and retention/deletion
 
 ## Release evidence
 A published dataset version includes manifest, schema, quality report, provenance and rights summaries, checksums, version and reproducibility notes. Narrative reports alone are insufficient.
+
+
+## Rights and licensing manifest (mandatory)
+
+Every external, mixed-origin, or distributable asset must have a machine-readable rights manifest under `rights/manifests/`. A dataset-level license is not inferred from the repository's software license.
+
+Minimum controls:
+
+- Preserve the original source URI, source title/provider, acquisition timestamp, acquisition method and accountable actor.
+- Record the exact SPDX license expression where known. Use `NOASSERTION` only to express that the license is not established; it is not an approval.
+- Record rights holder, evidence URI and evidence checksum where available, attribution text, restrictions, permitted and prohibited purposes, and whether redistribution, commercial use and model training are allowed.
+- Distinguish `unknown`, `needs_review`, `restricted`, `approved` and `prohibited` rights states. Only `approved` assets may pass a purpose-specific release gate.
+- An approval must identify the reviewer, review time, evidence and approved purposes. A license label alone is not sufficient evidence that the uploader had authority to grant it.
+- Derived assets inherit applicable restrictions from their inputs unless a documented legal basis establishes otherwise. Transformations do not automatically remove copyright, database rights, privacy, confidentiality or contractual restrictions.
+- Keep raw evidence and rights evidence immutable and checksummed. If terms change or permission is revoked, withdraw or re-evaluate affected dataset versions.
+
+The repository's manifest validator is a minimum structural gate, not a legal opinion or a substitute for human rights review. See `rights/README.md` and `scripts/check_rights_manifests.py`.
