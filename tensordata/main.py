@@ -407,15 +407,24 @@ def create_dataset_version(
                 status_code=422,
                 detail=f"Artifact {artifact.id} belongs to an asset prohibited from dataset assembly",
             )
+        required_profile = (
+            "tabular"
+            if asset.asset_type in {"table", "timeseries"}
+            or artifact.media_type in {"text/csv", "application/csv"}
+            else "general"
+        )
         latest_quality = db.scalar(
             select(QualityReport)
-            .where(QualityReport.artifact_id == artifact.id)
+            .where(
+                QualityReport.artifact_id == artifact.id,
+                QualityReport.profile == required_profile,
+            )
             .order_by(QualityReport.created_at.desc())
         )
         if latest_quality is None or latest_quality.artifact_sha256 != artifact.sha256:
             raise HTTPException(
                 status_code=422,
-                detail=f"Artifact {artifact.id} has no quality report for its current content",
+                detail=f"Artifact {artifact.id} has no {required_profile} quality report for its current content",
             )
         if latest_quality.status != "passed":
             raise HTTPException(
