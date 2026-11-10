@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cxs503/TensorData/blob/main/rights/manifest.schema.json",
+  "title": "TensorData Asset Rights Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest_version",
+    "asset_id",
+    "asset_type",
+    "source",
+    "rights",
+    "provenance",
+    "review"
+  ],
+  "properties": {
+    "manifest_version": {
+      "const": "tensordata.asset-rights.v1"
+    },
+    "asset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "asset_type": {
+      "enum": [
+        "dataset",
+        "document",
+        "image",
+        "audio",
+        "video",
+        "timeseries",
+        "scientific_field",
+        "model",
+        "code",
+        "benchmark",
+        "other"
+      ]
+    },
+    "asset_version": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_type",
+        "title",
+        "uri",
+        "acquired_at",
+        "acquisition_method",
+        "acquired_by"
+      ],
+      "properties": {
+        "source_type": {
+          "enum": [
+            "first_party",
+            "public_web",
+            "open_repository",
+            "institutional",
+            "customer",
+            "sensor",
+            "experiment",
+            "synthetic",
+            "third_party_vendor",
+            "other"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "acquired_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "acquisition_method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "acquired_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_version": {
+          "type": "string"
+        }
+      }
+    },
+    "rights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "license_expression",
+        "rights_holder",
+        "attribution",
+        "permitted_purposes",
+        "prohibited_purposes",
+        "redistribution",
+        "commercial_use",
+        "model_training",
+        "restrictions"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unknown",
+            "needs_review",
+            "restricted",
+            "approved",
+            "prohibited"
+          ]
+        },
+        "license_expression": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rights_holder": {
+          "type": "string"
+        },
+        "evidence_uri": {
+          "type": "string"
+        },
+        "evidence_sha256": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "attribution": {
+          "type": "string"
+        },
+        "permitted_purposes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "prohibited_purposes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "redistribution": {
+          "enum": [
+            "allowed",
+            "not_allowed",
+            "conditional",
+            "unknown"
+          ]
+        },
+        "commercial_use": {
+          "enum": [
+            "allowed",
+            "not_allowed",
+            "conditional",
+            "unknown"
+          ]
+        },
+        "model_training": {
+          "enum": [
+            "allowed",
+            "not_allowed",
+            "conditional",
+            "unknown"
+          ]
+        },
+        "restrictions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parent_asset_ids",
+        "transformations"
+      ],
+      "properties": {
+        "parent_asset_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "transformations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "version"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              },
+              "code_digest": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_reviewed",
+            "in_review",
+            "approved",
+            "rejected"
+          ]
+        },
+        "reviewed_by": {
+          "type": "string"
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "decision_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}
