@@ -29,7 +29,8 @@ from .schemas import (
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    Base.metadata.create_all(bind=engine)
+    if get_settings().auto_create_schema:
+        Base.metadata.create_all(bind=engine)
     get_settings().storage_root.mkdir(parents=True, exist_ok=True)
     yield
 
