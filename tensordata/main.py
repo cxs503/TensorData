@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from .config import get_settings
 from .db import Base, engine, get_db
 from .models import DataArtifact, DataAsset
-from .schemas import AssetCreate, AssetRead, ArtifactRead
+from .schemas import ArtifactRead, AssetCreate, AssetRead
 
 
 @asynccontextmanager
