@@ -1,3 +1,4 @@
+import json
 import os
 from contextlib import asynccontextmanager
 from hashlib import sha256
@@ -12,8 +13,18 @@ from sqlalchemy.orm import Session
 
 from .config import get_settings
 from .db import Base, engine, get_db
-from .models import DataArtifact, DataAsset
-from .schemas import ArtifactRead, AssetCreate, AssetRead
+from .models import DataArtifact, DataAsset, Dataset, DatasetVersion, ProvenanceRecord
+from .schemas import (
+    ArtifactRead,
+    AssetCreate,
+    AssetRead,
+    DatasetCreate,
+    DatasetRead,
+    DatasetVersionCreate,
+    DatasetVersionRead,
+    ProvenanceCreate,
+    ProvenanceRead,
+)
 
 
 @asynccontextmanager
@@ -25,8 +36,8 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(
     title="TensorData API",
-    version="0.1.0",
-    description="Governed data-asset registry and artifact service.",
+    version="0.2.0",
+    description="Governed data-asset registry, immutable dataset manifests, and provenance service.",
     lifespan=lifespan,
 )
 
@@ -201,3 +212,183 @@ def download_artifact(artifact_id: str, db: Session = DB_DEPENDENCY):
         filename=artifact.filename,
         headers={"ETag": f'"{artifact.sha256}"', "X-Content-SHA256": artifact.sha256},
     )
+
+
+@app.post("/api/v1/datasets", response_model=DatasetRead, status_code=status.HTTP_201_CREATED)
+def create_dataset(
+    payload: DatasetCreate,
+    _: None = AUTH_DEPENDENCY,
+    db: Session = DB_DEPENDENCY,
+):
+    dataset = Dataset(
+        name=payload.name,
+        description=payload.description,
+        owner=payload.owner,
+        intended_uses=payload.intended_uses,
+    )
+    db.add(dataset)
+    db.commit()
+    db.refresh(dataset)
+    return dataset
+
+
+@app.get("/api/v1/datasets", response_model=list[DatasetRead], dependencies=[AUTH_DEPENDENCY])
+def list_datasets(limit: int = 100, offset: int = 0, db: Session = DB_DEPENDENCY):
+    if limit < 1 or limit > 500 or offset < 0:
+        raise HTTPException(status_code=422, detail="limit must be 1..500 and offset >= 0")
+    query = select(Dataset).order_by(Dataset.created_at.desc()).offset(offset).limit(limit)
+    return list(db.scalars(query).all())
+
+
+@app.post(
+    "/api/v1/datasets/{dataset_id}/versions",
+    response_model=DatasetVersionRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_dataset_version(
+    dataset_id: str,
+    payload: DatasetVersionCreate,
+    _: None = AUTH_DEPENDENCY,
+    db: Session = DB_DEPENDENCY,
+):
+    dataset = db.get(Dataset, dataset_id)
+    if dataset is None:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+
+    existing_version = db.scalar(
+        select(DatasetVersion).where(
+            DatasetVersion.dataset_id == dataset_id,
+            DatasetVersion.version == payload.version,
+        )
+    )
+    if existing_version is not None:
+        raise HTTPException(status_code=409, detail="Dataset version already exists and is immutable")
+
+    artifact_ids = [member.artifact_id for member in payload.members]
+    if len(set(artifact_ids)) != len(artifact_ids):
+        raise HTTPException(status_code=422, detail="A dataset version cannot contain duplicate artifact IDs")
+
+    artifacts = list(db.scalars(select(DataArtifact).where(DataArtifact.id.in_(artifact_ids))).all())
+    artifact_by_id = {artifact.id: artifact for artifact in artifacts}
+    missing = sorted(set(artifact_ids) - set(artifact_by_id))
+    if missing:
+        raise HTTPException(status_code=422, detail={"unknown_artifact_ids": missing})
+
+    manifest_members = []
+    for member in payload.members:
+        artifact = artifact_by_id[member.artifact_id]
+        asset = db.get(DataAsset, artifact.asset_id)
+        manifest_members.append({
+            "artifact_id": artifact.id,
+            "asset_id": artifact.asset_id,
+            "asset_type": asset.asset_type,
+            "artifact_sha256": artifact.sha256,
+            "size_bytes": artifact.size_bytes,
+            "media_type": artifact.media_type,
+            "role": member.role,
+            "selector": member.selector,
+            "rights_status_at_snapshot": asset.rights_status,
+            "lifecycle_state_at_snapshot": asset.lifecycle_state,
+        })
+
+    manifest = {
+        "manifest_schema": "tensordata.dataset-manifest.v1",
+        "dataset_id": dataset.id,
+        "dataset_name": dataset.name,
+        "version": payload.version,
+        "members": manifest_members,
+        "split_definition": payload.split_definition,
+        "schema_refs": payload.schema_refs,
+        "transform_refs": payload.transform_refs,
+    }
+    canonical_manifest = json.dumps(manifest, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    manifest_digest = sha256(canonical_manifest.encode("utf-8")).hexdigest()
+
+    dataset_version = DatasetVersion(
+        dataset_id=dataset_id,
+        version=payload.version,
+        manifest_json=manifest,
+        manifest_sha256=manifest_digest,
+        created_by=payload.created_by,
+    )
+    db.add(dataset_version)
+    db.commit()
+    db.refresh(dataset_version)
+    return dataset_version
+
+
+@app.get(
+    "/api/v1/datasets/{dataset_id}/versions",
+    response_model=list[DatasetVersionRead],
+    dependencies=[AUTH_DEPENDENCY],
+)
+def list_dataset_versions(dataset_id: str, db: Session = DB_DEPENDENCY):
+    if db.get(Dataset, dataset_id) is None:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    query = (
+        select(DatasetVersion)
+        .where(DatasetVersion.dataset_id == dataset_id)
+        .order_by(DatasetVersion.created_at.desc())
+    )
+    return list(db.scalars(query).all())
+
+
+@app.get(
+    "/api/v1/datasets/{dataset_id}/versions/{version}",
+    response_model=DatasetVersionRead,
+    dependencies=[AUTH_DEPENDENCY],
+)
+def get_dataset_version(dataset_id: str, version: str, db: Session = DB_DEPENDENCY):
+    result = db.scalar(
+        select(DatasetVersion).where(
+            DatasetVersion.dataset_id == dataset_id,
+            DatasetVersion.version == version,
+        )
+    )
+    if result is None:
+        raise HTTPException(status_code=404, detail="Dataset version not found")
+    return result
+
+
+@app.post(
+    "/api/v1/provenance",
+    response_model=ProvenanceRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_provenance(
+    payload: ProvenanceCreate,
+    _: None = AUTH_DEPENDENCY,
+    db: Session = DB_DEPENDENCY,
+):
+    record = ProvenanceRecord(
+        activity_type=payload.activity_type,
+        inputs_json=payload.inputs,
+        outputs_json=payload.outputs,
+        parameters_json=payload.parameters,
+        responsible_actor=payload.responsible_actor,
+        code_digest=payload.code_digest,
+        environment_digest=payload.environment_digest,
+    )
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+    return record
+
+
+@app.get(
+    "/api/v1/provenance",
+    response_model=list[ProvenanceRead],
+    dependencies=[AUTH_DEPENDENCY],
+)
+def list_provenance(
+    activity_type: str | None = None,
+    limit: int = 100,
+    offset: int = 0,
+    db: Session = DB_DEPENDENCY,
+):
+    if limit < 1 or limit > 500 or offset < 0:
+        raise HTTPException(status_code=422, detail="limit must be 1..500 and offset >= 0")
+    query = select(ProvenanceRecord).order_by(ProvenanceRecord.created_at.desc()).offset(offset).limit(limit)
+    if activity_type:
+        query = query.where(ProvenanceRecord.activity_type == activity_type)
+    return list(db.scalars(query).all())
