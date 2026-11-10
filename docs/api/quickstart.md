@@ -180,3 +180,30 @@ curl "$TENSORDATA_URL/api/v1/lineage/artifacts/$ARTIFACT_ID" \
 ```
 
 The response includes connected artifact nodes, provenance activities, and external input references. This initial graph is not yet a full W3C PROV implementation.
+
+
+## Python client for agents
+
+Install TensorData with its runtime dependencies, then use the client to call the governed API workflow:
+
+```python
+from tensordata.client import TensorDataClient
+
+with TensorDataClient("https://your-tensordata-service", api_key="YOUR_API_KEY") as client:
+    asset = client.create_asset({
+        "name": "ship motion observations",
+        "asset_type": "timeseries",
+        "owner": "ship-data-agent",
+    })
+    artifact = client.upload_artifact(
+        asset["id"], "motion.csv", b"time,speed\\n0,2.1\\n1,2.4\\n",
+        media_type="text/csv",
+    )
+    report = client.run_quality_checks(
+        artifact["id"], profile="tabular", executed_by="ship-data-agent"
+    )
+    if report["status"] != "passed":
+        raise RuntimeError(f"Quality gate failed: {report['findings_json']}")
+```
+
+The client raises `TensorDataAPIError` for non-success responses and exposes the HTTP status and structured detail. Policy enforcement remains on the service.
