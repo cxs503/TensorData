@@ -149,6 +149,15 @@ def test_asset_dataset_version_and_provenance_lifecycle(monkeypatch):
             assert malformed_quality.json()["status"] == "failed"
             assert malformed_quality.json()["summary_json"]["malformed_rows"] == 1
 
+            # A looser general profile must not replace the required tabular profile.
+            general_quality = client.post(
+                f"/api/v1/artifacts/{artifact['id']}/quality-checks",
+                headers=headers,
+                json={"profile": "general", "executed_by": "quality-test-agent"},
+            )
+            assert general_quality.status_code == 201
+            assert general_quality.json()["status"] == "passed"
+
             version_response = client.post(
                 f"/api/v1/datasets/{dataset['id']}/versions",
                 headers=headers,
