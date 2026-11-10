@@ -26,17 +26,6 @@ These systems integrate through explicit APIs and stable identifiers. They must 
 9. **Open interfaces:** prefer interoperable formats and APIs; avoid unnecessary infrastructure duplication.
 10. **Agent-operated, human-governed:** agents may produce and review assets, while high-impact releases require independent checks and explicit policy.
 
-## Initial scope
-
-The first milestone is a small, real, independently runnable data-asset service—not a full lakehouse platform.
-
-- Canonical data-asset and dataset-version contracts
-- Provenance, lineage, quality, and access-policy metadata
-- Catalog and dataset registry
-- Validation and promotion lifecycle
-- API contracts for TensorPlatform and domain projects
-- Migration inventory for reusable TensorPlatform data components
-
 ## Architecture documents
 
 - [Architecture overview](docs/architecture/overview.md)
@@ -44,7 +33,19 @@ The first milestone is a small, real, independently runnable data-asset service�
 - [Governance and quality](docs/governance/data-governance.md)
 - [TensorPlatform migration plan](docs/migration/tensorplatform-migration.md)
 - [Roadmap](docs/roadmap.md)
+- [Local quickstart and API contract](docs/api/quickstart.md)
 
-## Status
+## Current implementation
 
-**Architecture foundation — implementation not yet production-ready.** The repository is being initialized. Features must not be described as operational until code, tests, and runtime evidence exist.
+An early MVP service exists:
+- FastAPI service with health endpoint
+- Asset metadata registration and catalog listing
+- API-key gate for all asset APIs
+- Local content-addressed artifact upload with SHA-256 metadata
+- Initial API tests
+
+**Not production-ready:** dataset versioning, provenance/lineage, executable quality gates, source/rights registry, Alembic migrations, scoped identity/authorization, S3-compatible storage, CI execution and deployment hardening remain future gates. The current service must be treated as an early development baseline, not a complete data platform.
+
+## Development
+
+See [Local quickstart](docs/api/quickstart.md). Do not commit secrets, real restricted data, or generated datasets to this repository.
