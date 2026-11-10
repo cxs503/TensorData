@@ -105,6 +105,31 @@ def test_asset_dataset_version_and_provenance_lifecycle(monkeypatch):
                 "transform_refs": [],
                 "created_by": "test-agent",
             }
+            blocked_without_quality = client.post(
+                f"/api/v1/datasets/{dataset['id']}/versions",
+                headers=headers,
+                json=version_payload,
+            )
+            assert blocked_without_quality.status_code == 422
+
+            quality_response = client.post(
+                f"/api/v1/artifacts/{artifact['id']}/quality-checks",
+                headers=headers,
+                json={"profile": "tabular", "executed_by": "quality-test-agent"},
+            )
+            assert quality_response.status_code == 201
+            quality_report = quality_response.json()
+            assert quality_report["status"] == "passed"
+            assert quality_report["summary_json"]["row_count"] == 2
+            assert quality_report["summary_json"]["column_count"] == 2
+
+            quality_reports = client.get(
+                f"/api/v1/artifacts/{artifact['id']}/quality-reports",
+                headers=headers,
+            )
+            assert quality_reports.status_code == 200
+            assert quality_reports.json()[0]["id"] == quality_report["id"]
+
             version_response = client.post(
                 f"/api/v1/datasets/{dataset['id']}/versions",
                 headers=headers,
