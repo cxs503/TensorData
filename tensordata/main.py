@@ -442,6 +442,10 @@ def create_dataset_version(
             "selector": member.selector,
             "rights_status_at_snapshot": asset.rights_status,
             "lifecycle_state_at_snapshot": asset.lifecycle_state,
+            "quality_report_id": latest_quality.id,
+            "quality_profile": latest_quality.profile,
+            "quality_ruleset_version": latest_quality.ruleset_version,
+            "quality_status": latest_quality.status,
         })
 
     manifest = {
@@ -513,6 +517,22 @@ def create_provenance(
     _: None = AUTH_DEPENDENCY,
     db: Session = DB_DEPENDENCY,
 ):
+    for reference in [*payload.inputs, *payload.outputs]:
+        referenced_artifact_id = reference.get("artifact_id")
+        if referenced_artifact_id:
+            referenced_artifact = db.get(DataArtifact, str(referenced_artifact_id))
+            if referenced_artifact is None:
+                raise HTTPException(
+                    status_code=422,
+                    detail={"unknown_artifact_id": referenced_artifact_id},
+                )
+            expected_sha256 = reference.get("sha256")
+            if expected_sha256 and expected_sha256 != referenced_artifact.sha256:
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"Artifact checksum mismatch for {referenced_artifact_id}",
+                )
+
     record = ProvenanceRecord(
         activity_type=payload.activity_type,
         inputs_json=payload.inputs,
@@ -526,6 +546,76 @@ def create_provenance(
     db.commit()
     db.refresh(record)
     return record
+
+
+
+@app.get("/api/v1/lineage/artifacts/{artifact_id}", dependencies=[AUTH_DEPENDENCY])
+def get_artifact_lineage(artifact_id: str, db: Session = DB_DEPENDENCY):
+    target = db.get(DataArtifact, artifact_id)
+    if target is None:
+        raise HTTPException(status_code=404, detail="Artifact not found")
+
+    records = list(db.scalars(select(ProvenanceRecord).order_by(ProvenanceRecord.created_at)).all())
+    connected_ids = {artifact_id}
+    included = set()
+    changed = True
+    while changed:
+        changed = False
+        for record in records:
+            if record.id in included:
+                continue
+            input_ids = {
+                str(item["artifact_id"])
+                for item in record.inputs_json
+                if isinstance(item, dict) and item.get("artifact_id")
+            }
+            output_ids = {
+                str(item["artifact_id"])
+                for item in record.outputs_json
+                if isinstance(item, dict) and item.get("artifact_id")
+            }
+            if connected_ids.intersection(input_ids | output_ids):
+                included.add(record.id)
+                before = len(connected_ids)
+                connected_ids.update(input_ids)
+                connected_ids.update(output_ids)
+                changed = changed or len(connected_ids) != before
+
+    activities = []
+    for record in records:
+        if record.id in included:
+            activities.append({
+                "id": record.id,
+                "activity_type": record.activity_type,
+                "inputs": record.inputs_json,
+                "outputs": record.outputs_json,
+                "parameters": record.parameters_json,
+                "responsible_actor": record.responsible_actor,
+                "code_digest": record.code_digest,
+                "environment_digest": record.environment_digest,
+                "created_at": record.created_at,
+            })
+
+    artifacts = list(db.scalars(select(DataArtifact).where(DataArtifact.id.in_(connected_ids))).all())
+    nodes = [{
+        "artifact_id": item.id,
+        "asset_id": item.asset_id,
+        "filename": item.filename,
+        "media_type": item.media_type,
+        "sha256": item.sha256,
+        "size_bytes": item.size_bytes,
+    } for item in artifacts]
+    return {
+        "target_artifact_id": artifact_id,
+        "artifacts": nodes,
+        "activities": activities,
+        "external_references": [
+            reference
+            for activity in activities
+            for reference in activity["inputs"]
+            if isinstance(reference, dict) and not reference.get("artifact_id")
+        ],
+    }
 
 
 @app.get(
