@@ -138,7 +138,7 @@ def test_asset_dataset_version_and_provenance_lifecycle(monkeypatch):
             malformed_upload = client.post(
                 f"/api/v1/assets/{malformed_asset['id']}/artifacts",
                 headers=headers,
-                files={"file": ("malformed.csv", b"a,b\\n1,2,3\\n", "text/csv")},
+                files={"file": ("malformed.csv", b"a,b\n1,2,3\n", "text/csv")},
             )
             malformed_quality = client.post(
                 f"/api/v1/artifacts/{malformed_upload.json()['id']}/quality-checks",
