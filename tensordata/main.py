@@ -267,26 +267,40 @@ def run_quality_checks(
     if payload.profile == "tabular":
         try:
             with file_path.open("r", encoding="utf-8-sig", newline="") as source:
-                reader = csv.DictReader(source)
-                headers = reader.fieldnames or []
-                rows = list(reader)
+                reader = csv.reader(source)
+                headers = next(reader, [])
                 if not headers or any(not header.strip() for header in headers):
                     findings.append({"rule_id": "tabular.header_present", "severity": "error", "message": "CSV must have non-empty column headers"})
-                if not rows:
+                row_count = 0
+                missing_cells = 0
+                duplicate_rows = 0
+                malformed_rows = 0
+                seen_rows = set()
+                for row in reader:
+                    row_count += 1
+                    if len(row) != len(headers):
+                        malformed_rows += 1
+                    normalized = tuple(value.strip() for value in row)
+                    missing_cells += sum(1 for value in normalized if not value)
+                    if normalized in seen_rows:
+                        duplicate_rows += 1
+                    else:
+                        seen_rows.add(normalized)
+                if row_count == 0:
                     findings.append({"rule_id": "tabular.rows_present", "severity": "error", "message": "CSV contains no data rows"})
-                missing_cells = sum(1 for row in rows for value in row.values() if value is None or not str(value).strip())
-                signatures = [tuple((value or "").strip() for value in row.values()) for row in rows]
-                duplicate_rows = len(signatures) - len(set(signatures))
+                if malformed_rows:
+                    findings.append({"rule_id": "tabular.row_width", "severity": "error", "count": malformed_rows, "message": "Rows do not match the header column count"})
                 if missing_cells:
                     findings.append({"rule_id": "tabular.missing_cells", "severity": "warning", "count": missing_cells, "message": "Missing or blank cells detected"})
                 if duplicate_rows:
                     findings.append({"rule_id": "tabular.duplicate_rows", "severity": "warning", "count": duplicate_rows, "message": "Duplicate rows detected"})
                 summary.update({
-                    "row_count": len(rows),
+                    "row_count": row_count,
                     "column_count": len(headers),
                     "columns": headers,
                     "missing_cells": missing_cells,
                     "duplicate_rows": duplicate_rows,
+                    "malformed_rows": malformed_rows,
                 })
         except (UnicodeDecodeError, csv.Error) as exc:
             findings.append({"rule_id": "tabular.csv_parseable", "severity": "error", "message": f"CSV parsing failed: {exc}"})
