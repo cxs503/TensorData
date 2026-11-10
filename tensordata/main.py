@@ -1,4 +1,3 @@
-import csv
 import json
 import os
 from contextlib import asynccontextmanager
@@ -22,6 +21,7 @@ from .models import (
     ProvenanceRecord,
     QualityReport,
 )
+from .quality import QualityEngine, build_default_registry
 from .schemas import (
     ArtifactRead,
     AssetCreate,
@@ -51,6 +51,10 @@ app = FastAPI(
     description="Governed data-asset registry, immutable dataset manifests, and provenance service.",
     lifespan=lifespan,
 )
+
+# Framework-free quality engine; the API layer only resolves the payload path,
+# runs the engine and persists the resulting report.
+QUALITY_ENGINE = QualityEngine(build_default_registry())
 
 
 def require_api_key(x_api_key: str | None = Header(default=None)) -> None:
@@ -248,72 +252,20 @@ def run_quality_checks(
     if not file_path.is_relative_to(storage_root) or not file_path.is_file():
         raise HTTPException(status_code=404, detail="Artifact payload is missing")
 
-    findings = []
-    actual_hash = sha256()
-    actual_size = 0
-    with file_path.open("rb") as source:
-        while chunk := source.read(1024 * 1024):
-            actual_hash.update(chunk)
-            actual_size += len(chunk)
-    checksum_matches = actual_hash.hexdigest() == artifact.sha256
-    if actual_size == 0:
-        findings.append({"rule_id": "file.non_empty", "severity": "error", "message": "Artifact is empty"})
-    if actual_size != artifact.size_bytes:
-        findings.append({"rule_id": "file.size_matches_metadata", "severity": "error", "message": "Stored size differs from metadata"})
-    if not checksum_matches:
-        findings.append({"rule_id": "file.sha256_matches_metadata", "severity": "error", "message": "Stored checksum differs from metadata"})
-
-    summary = {"size_bytes": actual_size, "sha256_verified": checksum_matches}
-    if payload.profile == "tabular":
-        try:
-            with file_path.open("r", encoding="utf-8-sig", newline="") as source:
-                reader = csv.reader(source)
-                headers = next(reader, [])
-                if not headers or any(not header.strip() for header in headers):
-                    findings.append({"rule_id": "tabular.header_present", "severity": "error", "message": "CSV must have non-empty column headers"})
-                row_count = 0
-                missing_cells = 0
-                duplicate_rows = 0
-                malformed_rows = 0
-                seen_rows = set()
-                for row in reader:
-                    row_count += 1
-                    if len(row) != len(headers):
-                        malformed_rows += 1
-                    normalized = tuple(value.strip() for value in row)
-                    missing_cells += sum(1 for value in normalized if not value)
-                    if normalized in seen_rows:
-                        duplicate_rows += 1
-                    else:
-                        seen_rows.add(normalized)
-                if row_count == 0:
-                    findings.append({"rule_id": "tabular.rows_present", "severity": "error", "message": "CSV contains no data rows"})
-                if malformed_rows:
-                    findings.append({"rule_id": "tabular.row_width", "severity": "error", "count": malformed_rows, "message": "Rows do not match the header column count"})
-                if missing_cells:
-                    findings.append({"rule_id": "tabular.missing_cells", "severity": "warning", "count": missing_cells, "message": "Missing or blank cells detected"})
-                if duplicate_rows:
-                    findings.append({"rule_id": "tabular.duplicate_rows", "severity": "warning", "count": duplicate_rows, "message": "Duplicate rows detected"})
-                summary.update({
-                    "row_count": row_count,
-                    "column_count": len(headers),
-                    "columns": headers,
-                    "missing_cells": missing_cells,
-                    "duplicate_rows": duplicate_rows,
-                    "malformed_rows": malformed_rows,
-                })
-        except (UnicodeDecodeError, csv.Error) as exc:
-            findings.append({"rule_id": "tabular.csv_parseable", "severity": "error", "message": f"CSV parsing failed: {exc}"})
-
-    failed = any(item["severity"] == "error" for item in findings)
+    result = QUALITY_ENGINE.run(
+        payload.profile,
+        file_path,
+        expected_sha256=artifact.sha256,
+        expected_size_bytes=artifact.size_bytes,
+    )
     report = QualityReport(
         artifact_id=artifact.id,
         artifact_sha256=artifact.sha256,
         profile=payload.profile,
-        ruleset_version="0.1.0",
-        status="failed" if failed else "passed",
-        summary_json=summary,
-        findings_json=findings,
+        ruleset_version=result.ruleset_version,
+        status=result.status,
+        summary_json=result.summary,
+        findings_json=result.finding_dicts(),
         executed_by=payload.executed_by,
     )
     db.add(report)
