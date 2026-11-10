@@ -1,0 +1,28 @@
+name: Asset rights manifest validation
+
+on:
+  pull_request:
+    paths:
+      - "rights/**"
+      - "scripts/check_rights_manifests.py"
+      - ".github/workflows/rights-manifest.yml"
+  push:
+    branches: [main]
+    paths:
+      - "rights/**"
+      - "scripts/check_rights_manifests.py"
+      - ".github/workflows/rights-manifest.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-rights-manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate asset rights manifests
+        run: python scripts/check_rights_manifests.py
