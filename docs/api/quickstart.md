@@ -147,3 +147,24 @@ The server computes SHA-256 and stores payloads under a digest-derived path. Dup
 - Local filesystem storage is for development; S3-compatible backend and retention/garbage collection are future work.
 - The upload handler enforces a configurable application-level size limit; production deployments also need proxy/server request limits and malware/content inspection.
 - CI must complete successfully before treating the service as deployable.
+
+
+## Artifact quality checks
+
+Run the general integrity profile or the tabular CSV profile:
+
+```bash
+curl -X POST "$TENSORDATA_URL/api/v1/artifacts/$ARTIFACT_ID/quality-checks" \
+  -H "X-API-Key: $TENSORDATA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"profile":"tabular","executed_by":"tensor-platform-agent"}'
+```
+
+Retrieve immutable reports:
+
+```bash
+curl "$TENSORDATA_URL/api/v1/artifacts/$ARTIFACT_ID/quality-reports" \
+  -H "X-API-Key: $TENSORDATA_API_KEY"
+```
+
+Dataset version creation requires a passing report whose recorded SHA-256 matches the artifact's current checksum. The tabular profile currently reports missing cells and duplicate rows as warnings; empty/malformed files and integrity mismatches fail the report. Domain-specific physical and multimodal validators are not yet included.
