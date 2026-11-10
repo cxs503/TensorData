@@ -167,7 +167,7 @@ curl "$TENSORDATA_URL/api/v1/artifacts/$ARTIFACT_ID/quality-reports" \
   -H "X-API-Key: $TENSORDATA_API_KEY"
 ```
 
-Dataset version creation requires a passing report whose recorded SHA-256 matches the artifact's current checksum. The tabular profile currently reports missing cells and duplicate rows as warnings; empty/malformed files, inconsistent row widths and integrity mismatches fail the report. Domain-specific physical and multimodal validators are not yet included.
+Dataset version creation requires a passing report whose recorded SHA-256 matches the artifact's current checksum. The tabular profile currently reports missing cells and duplicate rows as warnings; empty/malformed files, inconsistent row widths and integrity mismatches fail the report. Every report's summary additionally records `measured_sha256` (the bytes actually examined) and `executed_rules` (rule id + version pairs) for traceability — engine design and extension recipe: [docs/quality/engine.md](../quality/engine.md). Domain-specific physical and multimodal validators are not yet included.
 
 
 ## Provenance and lineage
