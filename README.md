@@ -45,13 +45,15 @@ An early development service now includes:
 - Local content-addressed artifact upload/retrieval with SHA-256 metadata
 - Dataset registry and immutable DatasetVersion manifest API
 - Canonical JSON manifest checksum and artifact/rights/lifecycle snapshot fields
-- Append-only provenance activity records with declared inputs, outputs, parameters, actor and optional code/environment digests
+- Append-only provenance activity records with validated artifact references and checksum matching
+- Artifact lineage graph traversal across connected provenance activities
+- Dataset manifests snapshot the exact quality report and ruleset used for admission
 - Alembic baseline migration with upgrade/downgrade support
 - Executable general/tabular artifact quality checks with immutable reports
 - Dataset-version admission gate requiring a passing report for the current artifact checksum
 - API integration tests and GitHub Actions test/lint workflow
 
-**Not production-ready:** evidence-backed rights approval, domain-specific quality validators, validated lineage graph, scoped identity/authorization, S3-compatible storage, retention/garbage collection, and deployment hardening remain future gates. Dataset manifests may currently snapshot assets in quarantine or rights-review states; a snapshot is not an authorization to train, publish, or redistribute data.
+**Not production-ready:** evidence-backed rights approval, domain-specific quality validators, scoped identity/authorization, S3-compatible storage, retention/garbage collection, and deployment hardening remain future gates. Dataset manifests may currently snapshot assets in quarantine or rights-review states; a snapshot is not an authorization to train, publish, or redistribute data.
 
 ## Development
 
