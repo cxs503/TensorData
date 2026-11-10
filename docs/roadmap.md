@@ -28,7 +28,9 @@
 ## M2 — Trust and governance
 - [ ] Source and rights registry with evidence-backed approval
 - [ ] Provenance and lineage graph (initial append-only activity records exist; reference validation and graph queries remain)
-- [ ] Quality rule execution and immutable reports
+- [x] Initial general/tabular quality rule execution and immutable reports
+- [x] Dataset-version gate requiring a passing quality report for the current artifact checksum
+- [ ] Domain validators (physical constraints, time continuity, multimodal alignment)
 - [ ] Quarantine/approval/publication transitions
 - [ ] Audit events and purpose-aware access checks
 - [ ] Prevent training/export use of assets without explicit rights and quality clearance
@@ -55,6 +57,8 @@
 Scale components are gated by measured workload, not adopted pre-emptively.
 
 ## Current milestone note
+
+Artifact quality checks currently verify stored size and SHA-256; the tabular profile additionally checks CSV headers/rows and reports missing cells and duplicate rows. Reports are append-only and tied to the exact artifact checksum. Dataset version creation now rejects artifacts without a passing report for their current checksum. This is a baseline validator, not yet a domain-scientific quality system.
 
 Dataset versions snapshot artifact IDs, content hashes, roles, selectors, rights/lifecycle state at snapshot time, split definitions, schema refs and transform refs. A manifest SHA-256 is calculated from canonical JSON. Version creation is append-only through the API: an existing dataset/version pair cannot be overwritten.
 
