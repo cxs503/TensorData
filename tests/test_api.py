@@ -130,6 +130,25 @@ def test_asset_dataset_version_and_provenance_lifecycle(monkeypatch):
             assert quality_reports.status_code == 200
             assert quality_reports.json()[0]["id"] == quality_report["id"]
 
+            malformed_asset = client.post("/api/v1/assets", headers=headers, json={
+                "name": f"malformed table {uuid4()}",
+                "asset_type": "table",
+                "owner": "quality-test",
+            }).json()
+            malformed_upload = client.post(
+                f"/api/v1/assets/{malformed_asset['id']}/artifacts",
+                headers=headers,
+                files={"file": ("malformed.csv", b"a,b\\n1,2,3\\n", "text/csv")},
+            )
+            malformed_quality = client.post(
+                f"/api/v1/artifacts/{malformed_upload.json()['id']}/quality-checks",
+                headers=headers,
+                json={"profile": "tabular", "executed_by": "quality-test-agent"},
+            )
+            assert malformed_quality.status_code == 201
+            assert malformed_quality.json()["status"] == "failed"
+            assert malformed_quality.json()["summary_json"]["malformed_rows"] == 1
+
             version_response = client.post(
                 f"/api/v1/datasets/{dataset['id']}/versions",
                 headers=headers,
