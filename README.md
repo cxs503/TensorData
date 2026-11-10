@@ -38,14 +38,17 @@ These systems integrate through explicit APIs and stable identifiers. They must 
 
 ## Current implementation
 
-An early MVP service exists:
-- FastAPI service with health endpoint
+An early development service now includes:
+- FastAPI service and health endpoint
 - Asset metadata registration and catalog listing
-- API-key gate for all asset APIs
-- Local content-addressed artifact upload and retrieval with SHA-256 metadata
-- Initial API tests and GitHub Actions test/lint workflow
+- API-key gate for all data APIs
+- Local content-addressed artifact upload/retrieval with SHA-256 metadata
+- Dataset registry and immutable DatasetVersion manifest API
+- Canonical JSON manifest checksum and artifact/rights/lifecycle snapshot fields
+- Append-only provenance activity records with declared inputs, outputs, parameters, actor and optional code/environment digests
+- API integration tests and GitHub Actions test/lint workflow
 
-**Not production-ready:** dataset versioning, provenance/lineage, executable quality gates, source/rights registry, Alembic migrations, scoped identity/authorization, S3-compatible storage, successful CI evidence and deployment hardening remain future gates. The current service is an early development baseline, not a complete data platform.
+**Not production-ready:** Alembic migrations, evidence-backed rights approval, quality gates, validated lineage graph, scoped identity/authorization, S3-compatible storage, retention/garbage collection, and deployment hardening remain future gates. Dataset manifests may currently snapshot assets in quarantine or rights-review states; a snapshot is not an authorization to train, publish, or redistribute data.
 
 ## Development
 
