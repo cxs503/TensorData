@@ -47,9 +47,11 @@ An early development service now includes:
 - Canonical JSON manifest checksum and artifact/rights/lifecycle snapshot fields
 - Append-only provenance activity records with declared inputs, outputs, parameters, actor and optional code/environment digests
 - Alembic baseline migration with upgrade/downgrade support
+- Executable general/tabular artifact quality checks with immutable reports
+- Dataset-version admission gate requiring a passing report for the current artifact checksum
 - API integration tests and GitHub Actions test/lint workflow
 
-**Not production-ready:** evidence-backed rights approval, quality gates, validated lineage graph, scoped identity/authorization, S3-compatible storage, retention/garbage collection, and deployment hardening remain future gates. Dataset manifests may currently snapshot assets in quarantine or rights-review states; a snapshot is not an authorization to train, publish, or redistribute data.
+**Not production-ready:** evidence-backed rights approval, domain-specific quality validators, validated lineage graph, scoped identity/authorization, S3-compatible storage, retention/garbage collection, and deployment hardening remain future gates. Dataset manifests may currently snapshot assets in quarantine or rights-review states; a snapshot is not an authorization to train, publish, or redistribute data.
 
 ## Development
 
