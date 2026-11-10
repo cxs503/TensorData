@@ -18,22 +18,25 @@
 - [x] API-key gate for all asset APIs
 - [ ] Alembic schema migrations
 - [ ] Full DataAsset/DataArtifact lifecycle and update/delete policy
-- [ ] Dataset and immutable DatasetVersion registry
+- [x] Dataset registry API
+- [x] Immutable DatasetVersion manifest API with content checksum
+- [x] Initial provenance activity record API
 - [ ] JSON Schema validation
-- [ ] Unit and API integration tests passing in CI
+- [ ] CI fully green on current default branch
 - [x] Docker-based local development entry point
 
 ## M2 — Trust and governance
 - [ ] Source and rights registry with evidence-backed approval
-- [ ] Provenance and lineage
+- [ ] Provenance and lineage graph (initial append-only activity records exist; reference validation and graph queries remain)
 - [ ] Quality rule execution and immutable reports
 - [ ] Quarantine/approval/publication transitions
 - [ ] Audit events and purpose-aware access checks
+- [ ] Prevent training/export use of assets without explicit rights and quality clearance
 
 ## M3 — Processing and connectors
 - [ ] Profiling, cleaning and transformation contracts
 - [ ] Connector SDK and first authorized source connectors
-- [ ] Dataset manifest and export/resolve APIs
+- [ ] Dataset manifest resolve/export API
 - [ ] Idempotency, retries and operational observability
 
 ## M4 — Tensor ecosystem integration
@@ -53,4 +56,8 @@ Scale components are gated by measured workload, not adopted pre-emptively.
 
 ## Current milestone note
 
-The service is an early development baseline. The CI workflow has been added and is being used to expose/fix integration defects; do not call M1 complete until the current test suite passes and schema migration/authentication hardening is addressed.
+Dataset versions snapshot artifact IDs, content hashes, roles, selectors, rights/lifecycle state at snapshot time, split definitions, schema refs and transform refs. A manifest SHA-256 is calculated from canonical JSON. Version creation is append-only through the API: an existing dataset/version pair cannot be overwritten.
+
+The current provenance endpoint records declared activity inputs, outputs, parameters, responsible actor and optional code/environment digests. It is not yet a verified W3C PROV implementation: referenced entities are not all validated and graph traversal is not implemented.
+
+The service remains an early development baseline. SQLAlchemy metadata create_all is still used for local schema creation; do not deploy schema changes to a shared production database until Alembic migrations, authorization hardening and a fully green CI gate are in place.
