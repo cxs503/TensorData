@@ -37,13 +37,22 @@ def test_asset_and_artifact_lifecycle(monkeypatch):
                 "name": "ship motion sample",
                 "asset_type": "timeseries",
                 "owner": "tensor-physics",
-                "rights_status": "approved",
-                "allowed_purposes": ["research", "model_training"],
+                "rights_status": "review_required",
+                "allowed_purposes": ["research"],
                 "metadata": {"domain": "ship"}
             })
             assert created.status_code == 201
             asset = created.json()
             assert asset["lifecycle_state"] == "quarantine"
+            assert asset["rights_status"] == "review_required"
+
+            rejected_self_approval = client.post("/api/v1/assets", headers=headers, json={
+                "name": "self-approved sample",
+                "asset_type": "document",
+                "owner": "untrusted-producer",
+                "rights_status": "approved"
+            })
+            assert rejected_self_approval.status_code == 422
 
             listed = client.get("/api/v1/assets", headers=headers)
             assert listed.status_code == 200
