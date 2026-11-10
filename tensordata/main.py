@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 from contextlib import asynccontextmanager
@@ -13,7 +14,7 @@ from sqlalchemy.orm import Session
 
 from .config import get_settings
 from .db import Base, engine, get_db
-from .models import DataArtifact, DataAsset, Dataset, DatasetVersion, ProvenanceRecord
+from .models import DataArtifact, DataAsset, Dataset, DatasetVersion, ProvenanceRecord, QualityReport
 from .schemas import (
     ArtifactRead,
     AssetCreate,
@@ -24,6 +25,8 @@ from .schemas import (
     DatasetVersionRead,
     ProvenanceCreate,
     ProvenanceRead,
+    QualityCheckCreate,
+    QualityReportRead,
 )
 
 
@@ -215,6 +218,105 @@ def download_artifact(artifact_id: str, db: Session = DB_DEPENDENCY):
     )
 
 
+@app.post(
+    "/api/v1/artifacts/{artifact_id}/quality-checks",
+    response_model=QualityReportRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def run_quality_checks(
+    artifact_id: str,
+    payload: QualityCheckCreate,
+    _: None = AUTH_DEPENDENCY,
+    db: Session = DB_DEPENDENCY,
+):
+    artifact = db.get(DataArtifact, artifact_id)
+    if artifact is None:
+        raise HTTPException(status_code=404, detail="Artifact not found")
+
+    parsed = urlparse(artifact.storage_uri)
+    if parsed.scheme != "file":
+        raise HTTPException(status_code=501, detail="Quality checks currently require local file storage")
+    file_path = Path(unquote(parsed.path)).resolve()
+    storage_root = get_settings().storage_root.resolve()
+    if not file_path.is_relative_to(storage_root) or not file_path.is_file():
+        raise HTTPException(status_code=404, detail="Artifact payload is missing")
+
+    findings = []
+    actual_hash = sha256()
+    actual_size = 0
+    with file_path.open("rb") as source:
+        while chunk := source.read(1024 * 1024):
+            actual_hash.update(chunk)
+            actual_size += len(chunk)
+    checksum_matches = actual_hash.hexdigest() == artifact.sha256
+    if actual_size == 0:
+        findings.append({"rule_id": "file.non_empty", "severity": "error", "message": "Artifact is empty"})
+    if actual_size != artifact.size_bytes:
+        findings.append({"rule_id": "file.size_matches_metadata", "severity": "error", "message": "Stored size differs from metadata"})
+    if not checksum_matches:
+        findings.append({"rule_id": "file.sha256_matches_metadata", "severity": "error", "message": "Stored checksum differs from metadata"})
+
+    summary = {"size_bytes": actual_size, "sha256_verified": checksum_matches}
+    if payload.profile == "tabular":
+        try:
+            with file_path.open("r", encoding="utf-8-sig", newline="") as source:
+                reader = csv.DictReader(source)
+                headers = reader.fieldnames or []
+                rows = list(reader)
+                if not headers or any(not header.strip() for header in headers):
+                    findings.append({"rule_id": "tabular.header_present", "severity": "error", "message": "CSV must have non-empty column headers"})
+                if not rows:
+                    findings.append({"rule_id": "tabular.rows_present", "severity": "error", "message": "CSV contains no data rows"})
+                missing_cells = sum(1 for row in rows for value in row.values() if value is None or not str(value).strip())
+                signatures = [tuple((value or "").strip() for value in row.values()) for row in rows]
+                duplicate_rows = len(signatures) - len(set(signatures))
+                if missing_cells:
+                    findings.append({"rule_id": "tabular.missing_cells", "severity": "warning", "count": missing_cells, "message": "Missing or blank cells detected"})
+                if duplicate_rows:
+                    findings.append({"rule_id": "tabular.duplicate_rows", "severity": "warning", "count": duplicate_rows, "message": "Duplicate rows detected"})
+                summary.update({
+                    "row_count": len(rows),
+                    "column_count": len(headers),
+                    "columns": headers,
+                    "missing_cells": missing_cells,
+                    "duplicate_rows": duplicate_rows,
+                })
+        except (UnicodeDecodeError, csv.Error) as exc:
+            findings.append({"rule_id": "tabular.csv_parseable", "severity": "error", "message": f"CSV parsing failed: {exc}"})
+
+    failed = any(item["severity"] == "error" for item in findings)
+    report = QualityReport(
+        artifact_id=artifact.id,
+        artifact_sha256=artifact.sha256,
+        profile=payload.profile,
+        ruleset_version="0.1.0",
+        status="failed" if failed else "passed",
+        summary_json=summary,
+        findings_json=findings,
+        executed_by=payload.executed_by,
+    )
+    db.add(report)
+    db.commit()
+    db.refresh(report)
+    return report
+
+
+@app.get(
+    "/api/v1/artifacts/{artifact_id}/quality-reports",
+    response_model=list[QualityReportRead],
+    dependencies=[AUTH_DEPENDENCY],
+)
+def list_quality_reports(artifact_id: str, db: Session = DB_DEPENDENCY):
+    if db.get(DataArtifact, artifact_id) is None:
+        raise HTTPException(status_code=404, detail="Artifact not found")
+    query = (
+        select(QualityReport)
+        .where(QualityReport.artifact_id == artifact_id)
+        .order_by(QualityReport.created_at.desc())
+    )
+    return list(db.scalars(query).all())
+
+
 @app.post("/api/v1/datasets", response_model=DatasetRead, status_code=status.HTTP_201_CREATED)
 def create_dataset(
     payload: DatasetCreate,
@@ -283,6 +385,21 @@ def create_dataset_version(
             raise HTTPException(
                 status_code=422,
                 detail=f"Artifact {artifact.id} belongs to an asset prohibited from dataset assembly",
+            )
+        latest_quality = db.scalar(
+            select(QualityReport)
+            .where(QualityReport.artifact_id == artifact.id)
+            .order_by(QualityReport.created_at.desc())
+        )
+        if latest_quality is None or latest_quality.artifact_sha256 != artifact.sha256:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Artifact {artifact.id} has no quality report for its current content",
+            )
+        if latest_quality.status != "passed":
+            raise HTTPException(
+                status_code=422,
+                detail=f"Artifact {artifact.id} failed its latest quality check",
             )
         manifest_members.append({
             "artifact_id": artifact.id,
