@@ -32,7 +32,7 @@ app = FastAPI(
 def require_api_key(x_api_key: str | None = Header(default=None)) -> None:
     expected = get_settings().api_key
     if not expected:
-        raise HTTPException(status_code=503, detail="Writes are disabled: configure TENSORDATA_API_KEY")
+        raise HTTPException(status_code=503, detail="API access is disabled: configure TENSORDATA_API_KEY")
     if x_api_key is None or x_api_key != expected:
         raise HTTPException(status_code=401, detail="Invalid or missing API key")
 
@@ -59,7 +59,7 @@ def create_asset(payload: AssetCreate, _: None = Depends(require_api_key), db: S
     return asset
 
 
-@app.get("/api/v1/assets", response_model=list[AssetRead])
+@app.get("/api/v1/assets", response_model=list[AssetRead], dependencies=[Depends(require_api_key)])
 def list_assets(
     asset_type: str | None = None,
     lifecycle_state: str | None = None,
@@ -77,7 +77,7 @@ def list_assets(
     return list(db.scalars(query).all())
 
 
-@app.get("/api/v1/assets/{asset_id}", response_model=AssetRead)
+@app.get("/api/v1/assets/{asset_id}", response_model=AssetRead, dependencies=[Depends(require_api_key)])
 def get_asset(asset_id: str, db: Session = Depends(get_db)):
     asset = db.get(DataAsset, asset_id)
     if asset is None:
@@ -138,7 +138,7 @@ async def upload_artifact(
         await file.close()
 
 
-@app.get("/api/v1/assets/{asset_id}/artifacts", response_model=list[ArtifactRead])
+@app.get("/api/v1/assets/{asset_id}/artifacts", response_model=list[ArtifactRead], dependencies=[Depends(require_api_key)])
 def list_artifacts(asset_id: str, db: Session = Depends(get_db)):
     if db.get(DataAsset, asset_id) is None:
         raise HTTPException(status_code=404, detail="Asset not found")
