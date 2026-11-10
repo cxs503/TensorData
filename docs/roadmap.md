@@ -27,7 +27,9 @@
 
 ## M2 — Trust and governance
 - [ ] Source and rights registry with evidence-backed approval
-- [ ] Provenance and lineage graph (initial append-only activity records exist; reference validation and graph queries remain)
+- [x] Validate artifact references and supplied checksums in provenance activities
+- [x] Traverse connected artifact lineage graph from a target artifact
+- [ ] Add paginated lineage queries, dataset-version nodes and external source identity resolution
 - [x] Initial general/tabular quality rule execution and immutable reports
 - [x] Dataset-version gate requiring a passing quality report for the current artifact checksum
 - [ ] Domain validators (physical constraints, time continuity, multimodal alignment)
@@ -58,10 +60,10 @@ Scale components are gated by measured workload, not adopted pre-emptively.
 
 ## Current milestone note
 
-Artifact quality checks currently verify stored size and SHA-256; the tabular profile additionally checks CSV headers/rows and reports missing cells and duplicate rows. Reports are append-only and tied to the exact artifact checksum. Dataset version creation now rejects artifacts without a passing report for their current checksum. This is a baseline validator, not yet a domain-scientific quality system.
+Artifact quality checks currently verify stored size and SHA-256; the tabular profile additionally checks CSV headers/rows and reports missing cells and duplicate rows. Dataset manifests snapshot the exact passing quality report ID, profile and ruleset version used for admission. Reports are append-only and tied to the exact artifact checksum. Dataset version creation now rejects artifacts without a passing report for their current checksum. This is a baseline validator, not yet a domain-scientific quality system.
 
 Dataset versions snapshot artifact IDs, content hashes, roles, selectors, rights/lifecycle state at snapshot time, split definitions, schema refs and transform refs. A manifest SHA-256 is calculated from canonical JSON. Version creation is append-only through the API: an existing dataset/version pair cannot be overwritten.
 
-The current provenance endpoint records declared activity inputs, outputs, parameters, responsible actor and optional code/environment digests. It is not yet a verified W3C PROV implementation: referenced entities are not all validated and graph traversal is not implemented.
+The provenance endpoint validates artifact references and optional checksums when artifact IDs are supplied. The lineage endpoint traverses connected provenance activities from a target artifact and returns artifact nodes, activity edges and external references. This is an initial internal graph contract, not yet a complete W3C PROV implementation; dataset-version nodes, pagination, external source identity resolution and authorization-aware graph filtering remain open.
 
 The service remains an early development baseline. Alembic now owns the initial schema baseline. Local development retains opt-in-by-default `create_all` for compatibility; the Docker image disables automatic schema creation and applies migrations before startup. Production readiness still requires migration testing against the target database, authorization hardening and operational validation.
