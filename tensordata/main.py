@@ -278,6 +278,11 @@ def create_dataset_version(
     for member in payload.members:
         artifact = artifact_by_id[member.artifact_id]
         asset = db.get(DataAsset, artifact.asset_id)
+        if asset.rights_status == "prohibited":
+            raise HTTPException(
+                status_code=422,
+                detail=f"Artifact {artifact.id} belongs to an asset prohibited from dataset assembly",
+            )
         manifest_members.append({
             "artifact_id": artifact.id,
             "asset_id": artifact.asset_id,
