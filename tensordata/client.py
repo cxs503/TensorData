@@ -1,6 +1,6 @@
 """Small synchronous client for TensorData's stable HTTP API."""
 
-from typing import Any
+from typing import Any, Self
 
 import httpx
 
@@ -35,7 +35,7 @@ class TensorDataClient:
     def close(self) -> None:
         self._client.close()
 
-    def __enter__(self) -> "TensorDataClient":
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *_: object) -> None:
