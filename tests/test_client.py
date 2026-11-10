@@ -62,9 +62,8 @@ def test_agent_client_exposes_structured_api_errors():
         "https://tensordata.example",
         "agent-key",
         transport=httpx.MockTransport(handler),
-    ) as client:
-        with pytest.raises(TensorDataAPIError) as error:
-            client.create_dataset_version("dataset-1", {"version": "1.0.0"})
+    ) as client, pytest.raises(TensorDataAPIError) as error:
+        client.create_dataset_version("dataset-1", {"version": "1.0.0"})
 
     assert error.value.status_code == 422
     assert error.value.detail == "quality report required"
