@@ -44,7 +44,8 @@
 - [ ] Idempotency, retries and operational observability
 
 ## M4 — Tensor ecosystem integration
-- [ ] TensorPlatform API client and workflow contract
+- [x] Initial synchronous TensorData Python client for Agent workflows
+- [ ] TensorPlatform production integration and workflow contract
 - [ ] TensorKnowledge asset registration contract
 - [ ] Domain validator plugin contract
 - [ ] Ship/physics AI pilot datasets and evaluation feedback
