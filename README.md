@@ -46,10 +46,13 @@ An early development service now includes:
 - Dataset registry and immutable DatasetVersion manifest API
 - Canonical JSON manifest checksum and artifact/rights/lifecycle snapshot fields
 - Append-only provenance activity records with declared inputs, outputs, parameters, actor and optional code/environment digests
+- Alembic baseline migration with upgrade/downgrade support
 - API integration tests and GitHub Actions test/lint workflow
 
-**Not production-ready:** Alembic migrations, evidence-backed rights approval, quality gates, validated lineage graph, scoped identity/authorization, S3-compatible storage, retention/garbage collection, and deployment hardening remain future gates. Dataset manifests may currently snapshot assets in quarantine or rights-review states; a snapshot is not an authorization to train, publish, or redistribute data.
+**Not production-ready:** evidence-backed rights approval, quality gates, validated lineage graph, scoped identity/authorization, S3-compatible storage, retention/garbage collection, and deployment hardening remain future gates. Dataset manifests may currently snapshot assets in quarantine or rights-review states; a snapshot is not an authorization to train, publish, or redistribute data.
 
 ## Development
+
+Schema migrations are managed with Alembic. Local quickstart mode retains automatic table creation for convenience; production containers disable it and run `alembic upgrade head` before starting the API.
 
 See [Local quickstart](docs/api/quickstart.md). Do not commit secrets, real restricted data, or generated datasets to this repository.
