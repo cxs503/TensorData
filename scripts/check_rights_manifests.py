@@ -65,7 +65,7 @@ def validate(path: Path) -> list[str]:
     review = data["review"]
     if not isinstance(review, dict):
         errors.append("review must be an object")
-    elif rights.get("status") == "approved" if isinstance(rights, dict) else False:
+    elif isinstance(rights, dict) and rights.get("status") == "approved":
         for key in ("reviewed_by", "reviewed_at"):
             if not str(review.get(key, "")).strip():
                 errors.append(f"approved manifest requires review.{key}")
