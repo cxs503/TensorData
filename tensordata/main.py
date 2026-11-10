@@ -27,6 +27,7 @@ app = FastAPI(
     title="TensorData API",
     version="0.1.0",
     description="Governed data-asset registry and artifact service.",
+    lifespan=lifespan,
 )
 
 
