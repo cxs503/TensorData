@@ -30,6 +30,7 @@ These systems integrate through explicit APIs and stable identifiers. They must 
 
 - [Architecture overview](docs/architecture/overview.md)
 - [Data asset model](docs/architecture/data-asset-model.md)
+- [Model asset registry](docs/models/model-registry.md)
 - [Governance and quality](docs/governance/data-governance.md)
 - [TensorPlatform migration plan](docs/migration/tensorplatform-migration.md)
 - [Initial TensorPlatform capability audit](docs/migration/tensorplatform-inventory-initial.md)
@@ -51,7 +52,11 @@ An early development service now includes:
 - Dataset manifests snapshot the exact quality report and ruleset used for admission
 - Alembic baseline migration with upgrade/downgrade support
 - Executable general/tabular artifact quality checks with immutable reports
-- Dataset-version admission gate requiring a passing report for the current artifact checksum
+- Model asset registry (`model-manifest/1.0`): versioned manifests binding task, IO contract,
+  weights sha256, training-data fingerprint, evaluation card and applicability domain, with
+  `load_model()` / CLI / HTTP load-and-use and a `verify` that recomputes every digest
+- Model weight inventory (`scripts/model_asset_inventory.py`) reconciling loose weight files
+  against registered model identities by sha256
 - API integration tests and GitHub Actions test/lint workflow
 
 **Not production-ready:** evidence-backed rights approval, domain-specific quality validators, scoped identity/authorization, S3-compatible storage, retention/garbage collection, and deployment hardening remain future gates. Dataset manifests may currently snapshot assets in quarantine or rights-review states; a snapshot is not an authorization to train, publish, or redistribute data.

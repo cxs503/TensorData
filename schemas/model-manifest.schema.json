@@ -1,0 +1,254 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tensordata.local/schemas/model-manifest-1.0.json",
+  "title": "TensorData model asset manifest (model-manifest/1.0)",
+  "description": "Contract for a reusable model asset: identity, task, input/output convention, weights payload, training-data fingerprint, evaluation evidence, applicability domain. Structural validation is duplicated in tensordata/modelreg/schema.py so the registry works without jsonschema installed.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "model_id",
+    "version",
+    "task",
+    "io_contract",
+    "artifacts",
+    "training_data",
+    "evaluation",
+    "applicability_domain",
+    "provenance",
+    "rights"
+  ],
+  "properties": {
+    "schema_version": { "const": "model-manifest/1.0" },
+    "model_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9]*([._-][a-z0-9]+)*$",
+      "description": "Stable lowercase slug; not a display name."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.\\-]+)?$",
+      "description": "Semantic version. Published versions are immutable."
+    },
+    "display_name": { "type": "string" },
+    "created_utc": { "type": "string" },
+    "task": {
+      "type": "object",
+      "required": ["task_type", "objective", "targets"],
+      "properties": {
+        "task_type": {
+          "enum": ["regression", "classification", "generation", "closure", "policy", "other"]
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1,
+          "description": "One sentence: what the model consumes and what it returns."
+        },
+        "domain_tags": { "type": "array", "items": { "type": "string" } },
+        "targets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "unit": { "type": "string" },
+              "description": { "type": "string" },
+              "condition": {
+                "type": "object",
+                "description": "Fixed operating point for the column (e.g. Froude number)."
+              }
+            }
+          }
+        }
+      }
+    },
+    "io_contract": {
+      "type": "object",
+      "required": ["inputs", "outputs", "batch_axis", "loader"],
+      "properties": {
+        "inputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "media_type", "shape", "dtype"],
+            "properties": {
+              "name": { "type": "string" },
+              "media_type": { "type": "string" },
+              "shape": { "type": "array", "minItems": 1 },
+              "dtype": { "type": "string" },
+              "units": { "type": "string" },
+              "columns": { "type": "array", "items": { "type": "string" } },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "outputs": { "type": "array", "minItems": 1 },
+        "batch_axis": { "type": "integer" },
+        "preprocessing": {
+          "type": "object",
+          "description": "Applied by the loader before/after the network. Declared, never guessed.",
+          "properties": {
+            "input_center": { "type": ["array", "null"] },
+            "input_scale": { "type": ["array", "null"] },
+            "output_center": { "type": ["array", "null"] },
+            "output_scale": { "type": ["array", "null"] }
+          }
+        },
+        "loader": {
+          "type": "object",
+          "required": ["kind"],
+          "properties": {
+            "kind": { "enum": ["torch-mlp", "numpy-affine"] },
+            "layers": { "type": "array", "items": { "type": "integer" } },
+            "activation": { "enum": ["relu", "gelu", "tanh", "silu", "none"] }
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["role", "path", "sha256", "bytes"],
+        "properties": {
+          "role": { "enum": ["weights", "tokenizer", "config", "eval_card", "training_table", "other"] },
+          "path": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*\\.\\.)[^\\s]+$",
+            "description": "Registry-relative POSIX path."
+          },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "bytes": { "type": "integer", "minimum": 0 },
+          "format": { "type": "string" },
+          "framework": { "type": "string" },
+          "media_type": { "type": "string" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "training_data": {
+      "type": "object",
+      "required": ["datasets", "fingerprint", "split"],
+      "properties": {
+        "datasets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["dataset_ref", "dataset_version", "fingerprint"],
+            "properties": {
+              "dataset_ref": { "type": "string" },
+              "dataset_version": { "type": "string" },
+              "source_uri": { "type": "string" },
+              "artifact_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+              "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+              "license": { "type": "string" }
+            }
+          }
+        },
+        "fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "Composite digest of the training table contents + split membership."
+        },
+        "fingerprint_recipe": {
+          "type": "object",
+          "description": "How to recompute the fingerprint during verify().",
+          "properties": {
+            "kind": { "const": "array-digest-v1" },
+            "table_path": { "type": "string" },
+            "arrays": { "type": "object", "additionalProperties": { "type": "string" } },
+            "array_digests": { "type": "object", "additionalProperties": { "type": "string" } },
+            "extra": { "type": "object" }
+          }
+        },
+        "split": {
+          "type": "object",
+          "required": ["scheme", "seed", "n_train", "n_test"],
+          "properties": {
+            "scheme": { "type": "string" },
+            "seed": { "type": ["integer", "string"] },
+            "n_train": { "type": "integer" },
+            "n_val": { "type": "integer" },
+            "n_test": { "type": "integer" },
+            "member_digest": { "type": "string" }
+          }
+        }
+      }
+    },
+    "training_config": {
+      "type": "object",
+      "description": "Hyperparameters + toolchain versions needed to retrain the weights.",
+      "additionalProperties": true
+    },
+    "evaluation": {
+      "type": "object",
+      "required": ["protocol", "metrics", "status"],
+      "properties": {
+        "protocol": {
+          "type": "string",
+          "description": "What was held out and how it was scored (must be falsifiable)."
+        },
+        "split": { "type": "string" },
+        "status": { "enum": ["evaluated", "not_evaluated"] },
+        "metrics": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "type": "object" },
+          "description": "Per-target metric object (r2/rmse/mape_pct/p95_abs_rel_err_pct/...)."
+        },
+        "baseline": { "type": "object" },
+        "caveats": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "applicability_domain": {
+      "type": "object",
+      "required": ["description", "bounds", "out_of_domain_policy", "caveats"],
+      "properties": {
+        "description": { "type": "string", "minLength": 1 },
+        "bounds": {
+          "type": "object",
+          "description": "Componentwise [low, high] range for the named input (key = io_contract.inputs[i].name).",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        },
+        "out_of_domain_policy": { "enum": ["flag", "reject"] },
+        "caveats": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["created_by", "repro_cmd"],
+      "properties": {
+        "created_by": { "type": "string" },
+        "repro_cmd": { "type": "string", "minLength": 1 },
+        "code": { "type": "object" },
+        "inputs": { "type": "array" },
+        "notes": { "type": "string" }
+      }
+    },
+    "rights": {
+      "type": "object",
+      "required": ["license"],
+      "properties": {
+        "license": { "type": "string" },
+        "data_license": { "type": "string" },
+        "redistribution": { "type": "string" },
+        "intended_uses": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "manifest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Canonical checksum of the manifest body without this field."
+    }
+  }
+}
