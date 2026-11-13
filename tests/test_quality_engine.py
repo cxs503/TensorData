@@ -56,7 +56,7 @@ def rule_ids(result):
 
 def test_registry_lists_builtin_profiles_and_rejects_unknown():
     engine = make_engine()
-    assert engine.registry.profile_names() == ["general", "tabular"]
+    assert engine.registry.profile_names() == ["general", "hull-mesh", "tabular"]
     with pytest.raises(UnknownProfileError):
         engine.run("mesh", __import__("pathlib").Path("."), expected_sha256="", expected_size_bytes=0)
 

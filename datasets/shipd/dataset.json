@@ -1,0 +1,147 @@
+{
+  "dataset_id": "shipd-30k-hull-design-vectors",
+  "title": "Ship-D: 30,000 ship hull design vectors (Bagazinski & Ahmed 2023)",
+  "version": "1.0.0-pinned-2025-01-29",
+  "modality": [
+    "table (design parameters)",
+    "mesh (STL, reconstructible)",
+    "geometry (parametric)"
+  ],
+  "size": {
+    "n_designs": 30000,
+    "n_parameters": 45,
+    "parameters": [
+      "LOA",
+      "Lb",
+      "Ls",
+      "Bd",
+      "Dd",
+      "Bs",
+      "WL",
+      "Bc",
+      "Beta",
+      "Rc",
+      "Rk",
+      "Abow",
+      "Bbow",
+      "BK_z",
+      "Kappa_bow",
+      "Adel_bow",
+      "Bdel_bow",
+      "Adrft",
+      "Bdrft",
+      "Cdrft",
+      "bit_EP_S",
+      "bit_EP_T",
+      "Atrans",
+      "SK_z",
+      "Kappa_stern",
+      "Adel_stern",
+      "Bdel_stern",
+      "Beta_trans",
+      "Bc_trans",
+      "Rc_trans",
+      "Rk_trans",
+      "bit_BB",
+      "bit_SB",
+      "Lbb",
+      "Hbb",
+      "Bbb",
+      "Lbbm",
+      "Rbb",
+      "Kappa_SB",
+      "Lsb",
+      "HSBOA",
+      "Hsb",
+      "Bsb",
+      "Lsbm",
+      "Rsb"
+    ]
+  },
+  "provenance": {
+    "origin": "https://github.com/noahbagz/ShipD",
+    "retrieved_via": "GitHub REST contents API (Accept: application/vnd.github.raw)",
+    "retrieved_at_utc": "2026-11-13T02:53Z",
+    "upstream_last_push": "2025-01-29T16:00:15Z",
+    "paper": "Bagazinski, N.J. & Ahmed, F. (2023). Ship-D: Ship Hull Dataset for Design Optimization Using Machine Learning. ASME IDETC-CIE, vol. 87301, V03AT03A028.",
+    "license": "NO LICENSE FILE in upstream repository -> rights_status=review_required; redistribution and commercial use NOT granted",
+    "license_evidence": "GitHub API repos/noahbagz/ShipD -> license: null; no LICENSE/COPYING file in git tree",
+    "files": {
+      "Compute_Dataset_Entirety.ipynb": {
+        "bytes": 59138,
+        "sha256": "aea7df9437b158b33598fcea15188eae040bb5e14c8529dbd0601a0d2ebec2fa"
+      },
+      "Gaussian_Curvature.py": {
+        "bytes": 2180,
+        "sha256": "43b5352bda4975a9e38e9124245a985175e31dd4ebd84d8a45c5fddcd4392353"
+      },
+      "HullParameterization.py": {
+        "bytes": 89228,
+        "sha256": "da44dc1d50bf466023118051ce3b33a4cce580218b7d3236ea08030f24682f28"
+      },
+      "HullParameterizationOverview.pdf": {
+        "bytes": 133891,
+        "sha256": "8ebd5ef46fa0aba95b16b4cf4d9ac060838743fcfe1c8f81e9a8636d7a095808"
+      },
+      "HullParameterization_ConstraintsOverview.pdf": {
+        "bytes": 129467,
+        "sha256": "6c45a7322c576dc5fff242162aaa03130de22a5124a6882adb6c9a063e07ae1e"
+      },
+      "InputVectors_30k.npy": {
+        "bytes": 10800128,
+        "sha256": "4d2ee3194ad6516b5dfd6bb4bc47aabc8968a356703fb1012fe415ca147663cf"
+      },
+      "Input_Vectors_SampleHulls.csv": {
+        "bytes": 3829,
+        "sha256": "1f769282766eb943160b54d5e3d0bdf83f820e4a3287ff0f77089dcf30f9c92b"
+      },
+      "MaxBox.py": {
+        "bytes": 5092,
+        "sha256": "00d382bc3a30bfb66832fb337928b7370ad5e26150d79bcd2cea0a5a764acd01"
+      },
+      "ModifiedMichellCw.py": {
+        "bytes": 9028,
+        "sha256": "4cbf815019b247094179d8a712f6058f6200a2a2f4b42b03b2d8749b47eff852"
+      },
+      "README.md": {
+        "bytes": 5235,
+        "sha256": "8e4e6a42a6331b01b5284d07cc713a78830f47fe88184c5a6f970570e48ee559"
+      },
+      "STLGen.py": {
+        "bytes": 1068,
+        "sha256": "544e5805bf6b1ff4b0b53882ecc54b6946cf9eb63c34028d6c0ec6acc0606ccc"
+      },
+      "X_LABELS.npy": {
+        "bytes": 2108,
+        "sha256": "c93bdc383e46fee86f0efc5f230a76c12717ef8f033ee8a075cc54ff3af14808"
+      },
+      "sample_Hull_Mesh.stl": {
+        "bytes": 11419284,
+        "sha256": "32cb70af27ac997c040055df05b33fc5fa8fff4aa04db2eccb5d4c47b4a6e6af"
+      }
+    },
+    "numpy_compat_note": "vendor code calls np.trapz (removed in numpy 2.x); scripts inject np.trapz=np.trapezoid at import time instead of editing the pinned payload"
+  },
+  "schema_ref": "datasets/shipd/schema/design-vector.schema.json",
+  "targets": {
+    "resistance": "Modified Michell wave resistance coefficient Cw at 8 Froude numbers x 4 draft ratios (vendor ModifiedMichellCw.py)",
+    "status": "computable on demand; a 600-design pilot slice is shipped as artifact, full 30k slice is a cluster job"
+  },
+  "rights_status": "review_required",
+  "intended_uses": [
+    "evaluation-only",
+    "research",
+    "surrogate-model-benchmarking"
+  ],
+  "not_allowed_until_reviewed": [
+    "redistribution of raw payload",
+    "training for commercial use",
+    "public re-release"
+  ],
+  "quality_gate": {
+    "profile": "hull-mesh (TensorData quality engine)",
+    "evidence": "artifacts/GAP-CAD-T2-SHIPD-5415/shipd/qa_summary.json",
+    "repro_cmd": "python scripts/shipd_geometry_qa.py --n 100 --workers 16 --out artifacts/GAP-CAD-T2-SHIPD-5415/shipd"
+  },
+  "fetch_cmd": "python scripts/fetch_sources.py --dataset shipd"
+}
