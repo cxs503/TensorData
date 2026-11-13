@@ -20,6 +20,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "ruff>=0.6"]
+# model registry: numpy for fingerprinting/tables, torch only for torch-mlp loaders
+modelreg = ["numpy>=1.24"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
