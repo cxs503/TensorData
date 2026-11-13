@@ -1,0 +1,74 @@
+{
+  "dataset_id": "dtmb5415-design-space-dr",
+  "title": "Design-Space Dimensionality Reduction Benchmark Dataset - DTMB 5415 Hull",
+  "version": "1.0.0-zenodo-19222008",
+  "modality": [
+    "table (27 design variables)",
+    "point cloud (2,250 surface points)",
+    "scientific field (pressure, wave elevation)",
+    "lumped hydrodynamics (Cw, az, xi5)"
+  ],
+  "size": {
+    "n_configurations": 9001,
+    "n_design_variables": 27,
+    "n_surface_points": 2250,
+    "n_wave_eleveation_points": 1500,
+    "froude_numbers": [
+      0.25,
+      0.33,
+      0.41
+    ]
+  },
+  "provenance": {
+    "doi": "10.5281/zenodo.19222008",
+    "record_url": "https://zenodo.org/records/19222008",
+    "creators": [
+      "Serani, Andrea",
+      "Diez, Matteo"
+    ],
+    "publication_date": "2026-03-25",
+    "retrieved_at_utc": "2026-11-13T02:53Z",
+    "license": "CC-BY-4.0 (redistribution permitted with attribution)",
+    "archive": {
+      "file": "dr-benchmark-5415hull.zip",
+      "bytes": 1087056986,
+      "sha256": "fc9b3745f27a85f8567d6dd0f7efde9affa04721c20677da7233acfe8d568112",
+      "zenodo_md5": "7a8cea6f94fb24da83dbeaf9a0601e61"
+    },
+    "inner_payload": "DTMB5415-database.mat (MATLAB 5.0 format, miCOMPRESSED; scipy.io required, h5py does NOT work)",
+    "solvers": {
+      "resistance": "WARP (linear potential flow, model scale)",
+      "seakeeping": "SMP (linear strip theory, full scale)"
+    },
+    "scaling": {
+      "geometry": "full scale, Lpp=142 m",
+      "calm_water": "model scale, Lpp=5.720 m",
+      "scale_factor": 24.825
+    }
+  },
+  "schema_ref": "datasets/dtmb5415-dr/schema/train-ready.schema.json",
+  "targets": {
+    "y": [
+      "Cw (Fr=0.25,0.33,0.41)",
+      "az RMS (Fr=0.25,0.33,0.41)",
+      "xi5 RMS (Fr=0.25,0.33,0.41)"
+    ],
+    "X": "27 normalized design variables in [-1,1]"
+  },
+  "rights_status": "approved_for_research_with_attribution",
+  "license": "CC-BY-4.0",
+  "intended_uses": [
+    "surrogate-training",
+    "dimensionality-reduction-benchmark",
+    "geometry-qa-benchmark"
+  ],
+  "quality_gate": {
+    "evidence": [
+      "artifacts/GAP-CAD-T2-SHIPD-5415/dtmb5415/geometry_gate.json",
+      "artifacts/GAP-CAD-T2-SHIPD-5415/dtmb5415/train_ready_manifest.json"
+    ],
+    "repro_cmd": "python scripts/dtmb5415_dataset_pipeline.py --n-geometry 100 --seed 20261113"
+  },
+  "fetch_cmd": "python scripts/fetch_sources.py --dataset dtmb5415",
+  "KNOWN_LIMIT": "payload ships an unstructured open half-hull point cloud: volume/Cb/watertightness are not measurable; the closed-manifold profile is NOT claimed for this dataset"
+}

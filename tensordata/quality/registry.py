@@ -41,12 +41,14 @@ class RuleRegistry:
 
 
 def build_default_registry() -> RuleRegistry:
-    """Wire the built-in 'general' and 'tabular' profiles (stage 1 set)."""
+    """Wire the built-in 'general', 'tabular' and 'hull-mesh' profiles."""
 
     from .profiles.general import GENERAL_PROFILE
+    from .profiles.hull_mesh import HULL_MESH_PROFILE
     from .profiles.tabular import TABULAR_PROFILE
 
     registry = RuleRegistry()
     registry.register(GENERAL_PROFILE)
     registry.register(TABULAR_PROFILE)
+    registry.register(HULL_MESH_PROFILE)
     return registry

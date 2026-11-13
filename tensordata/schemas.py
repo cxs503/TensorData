@@ -155,7 +155,7 @@ class ProvenanceRead(BaseModel):
 
 
 class QualityCheckCreate(BaseModel):
-    profile: Literal["general", "tabular"] = "general"
+    profile: Literal["general", "tabular", "hull-mesh"] = "general"
     executed_by: str = Field(min_length=1, max_length=255)
 
 
