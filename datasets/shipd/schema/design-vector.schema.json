@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tensordata/schemas/shipd/design-vector.schema.json",
+  "title": "ShipD design vector (45 parameters) with optional resistance targets",
+  "type": "object",
+  "required": [
+    "design_index",
+    "parameters"
+  ],
+  "properties": {
+    "design_index": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 29999
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "LOA",
+        "Lb",
+        "Ls",
+        "Bd",
+        "Dd",
+        "Bs",
+        "WL",
+        "Bc",
+        "Beta",
+        "Rc",
+        "Rk",
+        "Abow",
+        "Bbow",
+        "BK_z",
+        "Kappa_bow",
+        "Adel_bow",
+        "Bdel_bow",
+        "Adrft",
+        "Bdrft",
+        "Cdrft",
+        "bit_EP_S",
+        "bit_EP_T",
+        "Atrans",
+        "SK_z",
+        "Kappa_stern",
+        "Adel_stern",
+        "Bdel_stern",
+        "Beta_trans",
+        "Bc_trans",
+        "Rc_trans",
+        "Rk_trans",
+        "bit_BB",
+        "bit_SB",
+        "Lbb",
+        "Hbb",
+        "Bbb",
+        "Lbbm",
+        "Rbb",
+        "Kappa_SB",
+        "Lsb",
+        "HSBOA",
+        "Hsb",
+        "Bsb",
+        "Lsbm",
+        "Rsb"
+      ],
+      "properties": {
+        "LOA": {
+          "type": "number",
+          "minimum": 0,
+          "description": "length overall [m] or 1 for unit hull"
+        }
+      }
+    },
+    "targets": {
+      "type": "object",
+      "properties": {
+        "Cw": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 32,
+          "maxItems": 32,
+          "description": "Modified Michell wave resistance coefficient, 4 drafts x 8 Froude numbers"
+        },
+        "froude_numbers": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "const": [
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45
+          ]
+        },
+        "draft_ratios_of_Dd": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "const": [
+            0.25,
+            0.33,
+            0.5,
+            0.67
+          ]
+        }
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "properties": {
+        "stl_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "n_triangles": {
+          "type": "integer",
+          "minimum": 1000
+        },
+        "closed": {
+          "type": "boolean"
+        },
+        "volume": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "length": {
+          "type": "number"
+        },
+        "beam": {
+          "type": "number"
+        },
+        "depth": {
+          "type": "number"
+        }
+      }
+    },
+    "qc": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "const": "hull-mesh"
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed"
+          ]
+        },
+        "gate_pass": {
+          "type": "boolean"
+        },
+        "gate_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
