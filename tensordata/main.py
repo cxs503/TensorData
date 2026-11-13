@@ -1,12 +1,14 @@
 import json
 import os
+import shutil
+import tempfile
 from contextlib import asynccontextmanager
 from hashlib import sha256
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 from uuid import uuid4
 
-from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile, status
+from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -21,6 +23,8 @@ from .models import (
     ProvenanceRecord,
     QualityReport,
 )
+from .modelreg import LoaderError, ManifestError, ModelRegistry, RegistryError, load_model
+from .modelreg import schema as model_schema
 from .quality import QualityEngine, build_default_registry
 from .schemas import (
     ArtifactRead,
@@ -598,3 +602,121 @@ def list_provenance(
     if activity_type:
         query = query.where(ProvenanceRecord.activity_type == activity_type)
     return list(db.scalars(query).all())
+
+
+# --------------------------------------------------------------------------- #
+# Model asset registry (model-manifest/1.0)
+#
+# Model assets are files + a contract, so the API takes a manifest JSON body and
+# the payloads as multipart files whose *filename is the manifest-relative path*.
+# Digests are recomputed server-side; a client cannot assert its own sha256.
+# --------------------------------------------------------------------------- #
+def get_model_registry() -> ModelRegistry:
+    return ModelRegistry(get_settings().model_registry_root)
+
+
+def _safe_rel(path: str) -> str:
+    candidate = Path(path)
+    if candidate.is_absolute() or ".." in candidate.parts:
+        raise HTTPException(status_code=422, detail=f"artifact path must be relative: {path!r}")
+    return candidate.as_posix()
+
+
+@app.get("/api/v1/models", dependencies=[AUTH_DEPENDENCY])
+def list_models():
+    return get_model_registry().list_models()
+
+
+@app.post("/api/v1/models", status_code=status.HTTP_201_CREATED, dependencies=[AUTH_DEPENDENCY])
+async def register_model(
+    manifest: str = Form(..., description="model-manifest/1.0 JSON payload"),
+    artifacts: list[UploadFile] = File(default=[]),
+):
+    try:
+        body = json.loads(manifest)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=422, detail=f"manifest is not valid JSON: {exc}") from exc
+
+    registry = get_model_registry()
+    tmpdir = Path(tempfile.mkdtemp(prefix="modelreg-"))
+    try:
+        sources: dict[str, Path] = {}
+        for upload in artifacts:
+            rel = _safe_rel(upload.filename or "")
+            dest = tmpdir / rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            payload = await upload.read()
+            if len(payload) > get_settings().max_upload_bytes:
+                raise HTTPException(status_code=413, detail=f"artifact {rel} exceeds upload limit")
+            dest.write_bytes(payload)
+            sources[rel] = dest
+        registered = registry.register(body, sources)
+    except HTTPException:
+        raise
+    except RegistryError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except ManifestError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except OSError as exc:
+        raise HTTPException(status_code=500, detail=f"registry write failed: {exc}") from exc
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+    return _model_summary(registered)
+
+
+@app.get("/api/v1/models/{model_id}/versions", dependencies=[AUTH_DEPENDENCY])
+def list_model_versions(model_id: str):
+    registry = get_model_registry()
+    versions = registry.versions(model_id)
+    if not versions:
+        raise HTTPException(status_code=404, detail=f"unknown model_id {model_id}")
+    return {"model_id": model_id, "versions": versions}
+
+
+@app.get("/api/v1/models/{model_id}/verify", dependencies=[AUTH_DEPENDENCY])
+def verify_model(model_id: str, version: str | None = None):
+    try:
+        report = get_model_registry().verify(model_id, version)
+    except RegistryError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    if not report["ok"]:
+        raise HTTPException(status_code=409, detail=report)
+    return report
+
+
+@app.post("/api/v1/models/{model_id}/predict", dependencies=[AUTH_DEPENDENCY])
+def predict_model(model_id: str, payload: dict):
+    inputs = payload.get("inputs")
+    if inputs is None:
+        raise HTTPException(status_code=422, detail="body must contain 'inputs': [[...], ...]")
+    try:
+        predictor = load_model(get_model_registry(), model_id, payload.get("version"))
+        return predictor.predict_report(inputs)
+    except RegistryError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except LoaderError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except ImportError as exc:
+        raise HTTPException(status_code=503,
+                            detail=f"runtime for this model is not installed: {exc}") from exc
+
+
+@app.get("/api/v1/models/{model_id}", dependencies=[AUTH_DEPENDENCY])
+def get_model(model_id: str, version: str | None = None):
+    try:
+        return get_model_registry().load_manifest(model_id, version)
+    except RegistryError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+def _model_summary(manifest: dict) -> dict:
+    weights = next(a for a in manifest["artifacts"] if a["role"] == "weights")
+    return {
+        "model_id": manifest["model_id"],
+        "version": manifest["version"],
+        "manifest_sha256": manifest["manifest_sha256"],
+        "weights_sha256": weights["sha256"],
+        "data_fingerprint": manifest["training_data"]["fingerprint"],
+        "evaluation_status": manifest["evaluation"]["status"],
+        "schema_version": model_schema.SCHEMA_VERSION,
+    }
