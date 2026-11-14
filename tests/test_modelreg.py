@@ -355,7 +355,10 @@ REGISTRY = REPO / "models"
 D5415 = REGISTRY / "dtmb5415-lumped-surrogate"
 
 
-@pytest.mark.skipif(\n    not D5415.is_dir() or importlib.util.find_spec("torch") is None,\n    reason="DTMB 5415 surrogate or optional torch runtime is unavailable",\n)
+@pytest.mark.skipif(
+    not D5415.is_dir() or importlib.util.find_spec("torch") is None,
+    reason="DTMB 5415 surrogate or optional torch runtime is unavailable",
+)
 def test_registered_5415_surrogate_verifies_and_predicts():
     registry = ModelRegistry(REGISTRY)
     report = registry.verify("dtmb5415-lumped-surrogate")
