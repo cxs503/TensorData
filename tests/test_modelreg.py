@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import subprocess
 import sys
 from pathlib import Path
@@ -354,7 +355,7 @@ REGISTRY = REPO / "models"
 D5415 = REGISTRY / "dtmb5415-lumped-surrogate"
 
 
-@pytest.mark.skipif(not D5415.is_dir(), reason="DTMB 5415 surrogate not registered in this checkout")
+@pytest.mark.skipif(\n    not D5415.is_dir() or importlib.util.find_spec("torch") is None,\n    reason="DTMB 5415 surrogate or optional torch runtime is unavailable",\n)
 def test_registered_5415_surrogate_verifies_and_predicts():
     registry = ModelRegistry(REGISTRY)
     report = registry.verify("dtmb5415-lumped-surrogate")
