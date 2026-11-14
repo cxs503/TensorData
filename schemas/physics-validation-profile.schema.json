@@ -82,7 +82,13 @@
           },
           "unit": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "description": "Canonical unit used by profile ranges and downstream interpretation."
+          },
+          "source_unit": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Unit used by values in the source CSV; converted to unit for range checks. Defaults to unit."
           },
           "required": {
             "type": "boolean"
