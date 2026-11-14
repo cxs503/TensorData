@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TensorData Physics Validation Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile_id",
+    "version",
+    "domain",
+    "dataset_contract",
+    "variables",
+    "checks",
+    "rights_policy"
+  ],
+  "properties": {
+    "profile_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$"
+    },
+    "domain": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "reviewed",
+        "approved"
+      ]
+    },
+    "dataset_contract": {
+      "type": "object",
+      "required": [
+        "coordinate_axes",
+        "time_axis"
+      ],
+      "properties": {
+        "coordinate_axes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "time_axis": {
+          "type": "string"
+        },
+        "coordinate_reference_frame": {
+          "type": "string"
+        },
+        "mesh_reference": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "variables": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "role",
+          "unit"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "coordinate",
+              "time",
+              "state",
+              "derived",
+              "metadata"
+            ]
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
+          },
+          "valid_range": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "check_id",
+          "kind",
+          "required",
+          "applicability"
+        ],
+        "properties": {
+          "check_id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "finite_values",
+              "monotonic_axis",
+              "unit_consistency",
+              "boundary_condition",
+              "initial_condition",
+              "conservation",
+              "physical_bounds",
+              "multimodal_alignment",
+              "split_leakage"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "applicability": {
+            "type": "string",
+            "minLength": 1
+          },
+          "variables": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "formula": {
+            "type": "string"
+          },
+          "tolerance": {
+            "type": "number",
+            "minimum": 0
+          },
+          "parameters": {
+            "type": "object"
+          },
+          "assumptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "rights_policy": {
+      "enum": [
+        "require_cleared",
+        "allow_internal_restricted",
+        "metadata_only"
+      ]
+    },
+    "reference_cases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
