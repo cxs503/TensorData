@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import subprocess
 import sys
@@ -304,7 +305,7 @@ def test_predictor_rejects_wrong_input_width(tmp_path):
 # --------------------------------------------------------------------------- #
 def _cli(*args, cwd=REPO):
     return subprocess.run([sys.executable, "-m", "tensordata.modelreg.cli", *args],
-                          capture_output=True, text=True, cwd=cwd, timeout=180)
+                          check=False, capture_output=True, text=True, cwd=cwd, timeout=180)
 
 
 def test_cli_register_list_verify_predict(tmp_path):
@@ -354,7 +355,10 @@ REGISTRY = REPO / "models"
 D5415 = REGISTRY / "dtmb5415-lumped-surrogate"
 
 
-@pytest.mark.skipif(not D5415.is_dir(), reason="DTMB 5415 surrogate not registered in this checkout")
+@pytest.mark.skipif(
+    not D5415.is_dir() or importlib.util.find_spec("torch") is None,
+    reason="DTMB 5415 surrogate or optional torch runtime is unavailable",
+)
 def test_registered_5415_surrogate_verifies_and_predicts():
     registry = ModelRegistry(REGISTRY)
     report = registry.verify("dtmb5415-lumped-surrogate")
