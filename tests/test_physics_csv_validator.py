@@ -87,3 +87,15 @@ def test_physics_csv_validator_rejects_duplicate_profile_variables(tmp_path):
         assert "duplicate variable" in str(exc)
     else:
         raise AssertionError("duplicate variables must be rejected")
+
+
+def test_physics_csv_validator_does_not_accept_placeholder_unit_labels(tmp_path):
+    profile = _write_profile(tmp_path)
+    data = json.loads(profile.read_text(encoding="utf-8"))
+    data["variables"][1]["unit"] = "REQUIRED: velocity unit"
+    profile.write_text(json.dumps(data), encoding="utf-8")
+    dataset = _write_csv(tmp_path, "t,u,rho\\n0,1.2,998\\n1,1.3,997\\n")
+    report = validate_physics_csv(dataset, profile, rights_status="cleared")
+    assert report["overall_status"] == "inconclusive"
+    unit_check = next(item for item in report["checks"] if item["check_id"] == "units")
+    assert unit_check["state"] == "inconclusive"
