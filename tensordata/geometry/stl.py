@@ -100,8 +100,18 @@ def _detect_format(path: Path) -> tuple[str, int]:
     size = path.stat().st_size
     with path.open("rb") as fh:
         head = fh.read(5)
-    if head == b"solid" and b"\n" not in head:
-        return "binary", size
+    if head.lower() == b"solid":
+        # Both ASCII and binary STL may begin with "solid". Prefer binary only
+        # when the declared triangle count exactly matches the byte length.
+        with path.open("rb") as fh:
+            fh.read(_BINARY_HEADER)
+            raw = fh.read(4)
+        if len(raw) == 4:
+            (count,) = struct.unpack("<I", raw)
+            if size == _BINARY_HEADER + 4 + _BINARY_TRI * count:
+                return "binary", size
+        return "ascii", size
+    return "binary", size
     if head.lower() == b"solid":
         # ASCII STL also starts with "solid"; decide on the exact binary length.
         with path.open("rb") as fh:
