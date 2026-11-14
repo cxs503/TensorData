@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "ruff>=0.6"]
+dev = ["pytest>=8.0", "ruff>=0.6", "numpy>=1.24"]
 # model registry: numpy for fingerprinting/tables, torch only for torch-mlp loaders
 modelreg = ["numpy>=1.24"]
 
