@@ -10,9 +10,10 @@ import csv
 import hashlib
 import json
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from itertools import pairwise
 
 SUPPORTED_CHECKS = {
     "finite_values",
@@ -94,7 +95,7 @@ def validate_physics_csv(
 
     digest = _sha256(source)
     evidence_ref = f"file:sha256:{digest}"
-    now = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    now = datetime.now(UTC).replace(microsecond=0).isoformat()
     findings: list[dict[str, Any]] = []
     checks_out: list[dict[str, Any]] = []
 
@@ -185,7 +186,7 @@ def validate_physics_csv(
             else:
                 # Repeated coordinates are allowed; only decreases violate ordering.
                 unique_consecutive = [v for i, v in enumerate(values) if i == 0 or v != values[i - 1]]
-                monotonic = all(b > a for a, b in zip(unique_consecutive, unique_consecutive[1:]))
+                monotonic = all(b > a for a, b in pairwise(unique_consecutive))
                 record(check, "passed" if monotonic else "failed",
                        f"Axis {name} is strictly increasing after collapsing adjacent repeats."
                        if monotonic else f"Axis {name} decreases or is not strictly increasing.",
