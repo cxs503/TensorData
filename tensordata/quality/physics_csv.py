@@ -11,9 +11,9 @@ import hashlib
 import json
 import math
 from datetime import UTC, datetime
+from itertools import pairwise
 from pathlib import Path
 from typing import Any
-from itertools import pairwise
 
 SUPPORTED_CHECKS = {
     "finite_values",
