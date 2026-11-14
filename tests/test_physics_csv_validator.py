@@ -109,3 +109,47 @@ def test_physics_profile_schema_version_pattern_matches_semver():
     pattern = schema["properties"]["version"]["pattern"]
     assert re.fullmatch(pattern, "0.1.0")
     assert not re.fullmatch(pattern, "draft")
+
+
+def test_physics_profile_rejects_duplicate_check_ids(tmp_path):
+    checks = [
+        {"check_id": "same", "kind": "finite_values", "required": True,
+         "applicability": "first"},
+        {"check_id": "same", "kind": "monotonic_axis", "required": True,
+         "applicability": "second"},
+    ]
+    profile = _write_profile(tmp_path, checks)
+    dataset = _write_csv(tmp_path, "t,u,rho\\n0,1.2,998\\n1,1.3,997\\n")
+    try:
+        validate_physics_csv(dataset, profile, rights_status="cleared")
+    except PhysicsProfileError as exc:
+        assert "duplicate check_id" in str(exc)
+    else:
+        raise AssertionError("duplicate check IDs must be rejected")
+
+
+def test_physics_profile_rejects_invalid_physical_range(tmp_path):
+    profile = _write_profile(tmp_path)
+    data = json.loads(profile.read_text(encoding="utf-8"))
+    data["variables"][2]["valid_range"] = [10, 1]
+    profile.write_text(json.dumps(data), encoding="utf-8")
+    dataset = _write_csv(tmp_path, "t,u,rho\\n0,1.2,998\\n1,1.3,997\\n")
+    try:
+        validate_physics_csv(dataset, profile, rights_status="cleared")
+    except PhysicsProfileError as exc:
+        assert "valid_range" in str(exc)
+    else:
+        raise AssertionError("invalid physical ranges must be rejected")
+
+
+def test_physics_profile_rejects_unknown_variable_references(tmp_path):
+    checks = [{"check_id": "finite", "kind": "finite_values", "required": True,
+               "applicability": "declared fields", "variables": ["pressure"]}]
+    profile = _write_profile(tmp_path, checks)
+    dataset = _write_csv(tmp_path, "t,u,rho\\n0,1.2,998\\n1,1.3,997\\n")
+    try:
+        validate_physics_csv(dataset, profile, rights_status="cleared")
+    except PhysicsProfileError as exc:
+        assert "unknown variables" in str(exc)
+    else:
+        raise AssertionError("unknown profile variable references must be rejected")
