@@ -1,4 +1,6 @@
 import json
+import re
+from pathlib import Path
 
 from tensordata.quality.physics_csv import PhysicsProfileError, validate_physics_csv
 
@@ -99,3 +101,11 @@ def test_physics_csv_validator_does_not_accept_placeholder_unit_labels(tmp_path)
     assert report["overall_status"] == "inconclusive"
     unit_check = next(item for item in report["checks"] if item["check_id"] == "units")
     assert unit_check["state"] == "inconclusive"
+
+
+def test_physics_profile_schema_version_pattern_matches_semver():
+    schema_path = Path(__file__).resolve().parents[1] / "schemas" / "physics-validation-profile.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    pattern = schema["properties"]["version"]["pattern"]
+    assert re.fullmatch(pattern, "0.1.0")
+    assert not re.fullmatch(pattern, "draft")
