@@ -306,7 +306,8 @@ def validate_physics_csv(
         "findings": findings,
         "evidence_refs": [evidence_ref],
         "overall_status": overall,
-        "summary": {"row_count": len(rows), "columns": headers, "rights_status": rights_status,\n                    "unit_conversions": unit_conversions},
+        "summary": {"row_count": len(rows), "columns": headers, "rights_status": rights_status,
+                    "unit_conversions": unit_conversions},
         "provenance": {
             "input_fingerprints": {"dataset_sha256": digest, "profile_sha256": _sha256(profile_file)},
         },
