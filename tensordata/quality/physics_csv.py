@@ -62,11 +62,31 @@ def _validate_profile(profile: Any) -> dict[str, Any]:
         if item["name"] in names:
             raise PhysicsProfileError(f"duplicate variable: {item['name']}")
         names.add(item["name"])
+        if "valid_range" in item:
+            bounds = item["valid_range"]
+            if (not isinstance(bounds, list) or len(bounds) != 2
+                    or any(isinstance(v, bool) or not isinstance(v, (int, float))
+                           or not math.isfinite(float(v)) for v in bounds)
+                    or bounds[0] >= bounds[1]):
+                raise PhysicsProfileError(
+                    f"variable {item['name']} valid_range must be two finite increasing numbers"
+                )
+    check_ids: set[str] = set()
     for check in profile["checks"]:
         if not isinstance(check, dict) or not all(
             key in check for key in ("check_id", "kind", "required", "applicability")
         ):
             raise PhysicsProfileError("each check requires check_id, kind, required and applicability")
+        if not isinstance(check["check_id"], str) or not check["check_id"].strip():
+            raise PhysicsProfileError("check_id must be a non-empty string")
+        if check["check_id"] in check_ids:
+            raise PhysicsProfileError(f"duplicate check_id: {check['check_id']}")
+        check_ids.add(check["check_id"])
+        if not isinstance(check["required"], bool):
+            raise PhysicsProfileError(f"check {check['check_id']} required must be boolean")
+        selected = check.get("variables", [])
+        if not isinstance(selected, list) or any(name not in names for name in selected):
+            raise PhysicsProfileError(f"check {check['check_id']} references unknown variables")
         if check["kind"] not in SUPPORTED_CHECKS | {
             "boundary_condition", "initial_condition", "conservation",
             "multimodal_alignment",
