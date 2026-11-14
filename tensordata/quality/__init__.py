@@ -17,6 +17,7 @@ from .base import (
 )
 from .engine import QualityEngine, measure_file
 from .registry import RULESET_VERSION, RuleRegistry, UnknownProfileError, build_default_registry
+from .physics_csv import PhysicsProfileError, validate_physics_csv
 
 __all__ = [
     "QUALITY_RULESET_VERSION",
@@ -26,6 +27,7 @@ __all__ = [
     "FileScan",
     "Finding",
     "Profile",
+    "PhysicsProfileError",
     "QualityEngine",
     "Rule",
     "RuleContext",
@@ -34,6 +36,7 @@ __all__ = [
     "UnknownProfileError",
     "build_default_registry",
     "measure_file",
+    "validate_physics_csv",
 ]
 
 QUALITY_RULESET_VERSION = RULESET_VERSION
