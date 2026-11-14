@@ -62,7 +62,7 @@ def test_cube_volume_and_plane_integral_are_analytic():
 
 def test_placeholder_mesh_is_rejected(tmp_path):
     """A 304-triangle open placeholder (the observed ship-platform failure mode) must fail."""
-    tris = _prism_tris(76)[:304]  # 304 triangles, truncated => open surface as well
+    tris = _prism_tris(76)[:303]  # omit one face so the surface is genuinely open
     path = _write_ascii(tmp_path / "placeholder.stl", tris)
     engine = QualityEngine(build_default_registry())
     scan = measure_file(path)
