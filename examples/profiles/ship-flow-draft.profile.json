@@ -1,0 +1,76 @@
+{
+  "profile_id": "ship-flow-draft",
+  "version": "0.1.0",
+  "domain": "incompressible_ship_hydrodynamics",
+  "status": "draft",
+  "dataset_contract": {
+    "coordinate_axes": [
+      "x",
+      "y",
+      "z"
+    ],
+    "time_axis": "t",
+    "coordinate_reference_frame": "REQUIRED: declare model/body/world frame",
+    "mesh_reference": "REQUIRED: immutable mesh asset reference"
+  },
+  "variables": [
+    {
+      "name": "u",
+      "role": "state",
+      "unit": "REQUIRED: velocity unit"
+    },
+    {
+      "name": "v",
+      "role": "state",
+      "unit": "REQUIRED: velocity unit"
+    },
+    {
+      "name": "w",
+      "role": "state",
+      "unit": "REQUIRED: velocity unit"
+    },
+    {
+      "name": "p",
+      "role": "state",
+      "unit": "REQUIRED: pressure unit"
+    }
+  ],
+  "checks": [
+    {
+      "check_id": "finite-fields",
+      "kind": "finite_values",
+      "required": true,
+      "applicability": "All declared numerical fields",
+      "variables": [
+        "u",
+        "v",
+        "w",
+        "p"
+      ]
+    },
+    {
+      "check_id": "time-monotonic",
+      "kind": "monotonic_axis",
+      "required": true,
+      "applicability": "Dataset contains transient samples",
+      "variables": [
+        "t"
+      ]
+    },
+    {
+      "check_id": "coordinate-frame",
+      "kind": "multimodal_alignment",
+      "required": true,
+      "applicability": "A coordinate reference frame and mesh reference are declared",
+      "assumptions": [
+        "This check verifies metadata consistency only; geometric registration requires a separate adapter."
+      ]
+    }
+  ],
+  "rights_policy": "require_cleared",
+  "reference_cases": [],
+  "notes": [
+    "Draft template only; not approved for production validation or training admission.",
+    "Domain owner must replace REQUIRED unit/frame placeholders and add boundary, conservation and physical-bound checks with equations and tolerances before approval."
+  ]
+}
