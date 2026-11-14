@@ -116,8 +116,7 @@ def validate_physics_csv(
                 "severity": severity if state == "failed" else "info",
                 "summary": detail,
                 "rationale": detail,
-                "evidence_refs": [evidence_ref],
-                "review_state": "unreviewed",
+                        "review_state": "unreviewed",
                 "limitations": [],
             })
 
