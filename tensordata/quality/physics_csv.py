@@ -153,6 +153,7 @@ def validate_physics_csv(
                 name for name in variables
                 if name not in declared
                 or str(declared[name].get("unit", "")).strip().lower() in KNOWN_PLACEHOLDERS
+                or str(declared[name].get("unit", "")).strip().lower().startswith("required")
             ]
             if unknown:
                 record(check, "inconclusive", f"Units are missing or unresolved for: {', '.join(unknown)}")
