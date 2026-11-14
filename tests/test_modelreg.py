@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import json
 import importlib.util
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -305,7 +305,7 @@ def test_predictor_rejects_wrong_input_width(tmp_path):
 # --------------------------------------------------------------------------- #
 def _cli(*args, cwd=REPO):
     return subprocess.run([sys.executable, "-m", "tensordata.modelreg.cli", *args],
-                          capture_output=True, text=True, cwd=cwd, timeout=180)
+                          check=False, capture_output=True, text=True, cwd=cwd, timeout=180)
 
 
 def test_cli_register_list_verify_predict(tmp_path):
