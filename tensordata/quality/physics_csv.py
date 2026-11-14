@@ -246,6 +246,16 @@ def validate_physics_csv(
                        severity="high")
         elif kind == "physical_bounds":
             violations: list[str] = []
+            unresolved_units = [
+                name for name in applicable
+                if declared.get(name, {}).get("valid_range")
+                and name not in unit_conversions
+            ]
+            if unresolved_units:
+                record(check, "inconclusive",
+                       "Cannot safely apply canonical physical ranges because source/target units "
+                       f"are unknown or incompatible for: {', '.join(unresolved_units)}")
+                continue
             for name in applicable:
                 bounds = declared.get(name, {}).get("valid_range")
                 if not bounds or len(bounds) != 2:
