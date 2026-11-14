@@ -15,6 +15,8 @@ from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
+from .units import compatible, convert_value, get_unit
+
 SUPPORTED_CHECKS = {
     "finite_values",
     "monotonic_axis",
@@ -151,6 +153,12 @@ def validate_physics_csv(
         raise PhysicsProfileError("dataset CSV must contain a header and at least one data row")
 
     declared = {item["name"]: item for item in profile["variables"]}
+    unit_conversions: dict[str, dict[str, str]] = {}
+    for name, spec in declared.items():
+        target_unit = str(spec.get("unit", "")).strip()
+        source_unit = str(spec.get("source_unit") or target_unit).strip()
+        if get_unit(target_unit) and get_unit(source_unit) and compatible(source_unit, target_unit):
+            unit_conversions[name] = {"source_unit": source_unit, "target_unit": target_unit}
     missing = [name for name, spec in declared.items() if spec.get("required", True) and name not in headers]
     if missing:
         check = {
@@ -168,16 +176,41 @@ def validate_physics_csv(
             record(check, "inconclusive", f"{kind} is not implemented by the CSV adapter; {check['applicability']}")
             continue
         if kind == "unit_consistency":
-            unknown = [
-                name for name in variables
-                if name not in declared
-                or str(declared[name].get("unit", "")).strip().lower() in KNOWN_PLACEHOLDERS
-                or str(declared[name].get("unit", "")).strip().lower().startswith("required")
-            ]
-            if unknown:
-                record(check, "inconclusive", f"Units are missing or unresolved for: {', '.join(unknown)}")
+            unresolved: list[str] = []
+            incompatible: list[str] = []
+            for name in variables:
+                spec = declared.get(name, {})
+                target_unit = str(spec.get("unit", "")).strip()
+                source_unit = str(spec.get("source_unit") or target_unit).strip()
+                if (target_unit.lower() in KNOWN_PLACEHOLDERS
+                        or source_unit.lower() in KNOWN_PLACEHOLDERS
+                        or get_unit(target_unit) is None or get_unit(source_unit) is None):
+                    unresolved.append(name)
+                elif not compatible(source_unit, target_unit):
+                    incompatible.append(f"{name}: {source_unit} -> {target_unit}")
+                else:
+                    unit_conversions[name] = {
+                        "source_unit": source_unit, "target_unit": target_unit
+                    }
+            if incompatible:
+                record(check, "failed",
+                       "Incompatible physical dimensions: " + "; ".join(incompatible),
+                       severity="high")
+            elif unresolved:
+                record(check, "inconclusive",
+                       f"Units are missing or unsupported for: {', '.join(unresolved)}")
             else:
-                record(check, "passed", "All selected variables have explicit unit declarations in the profile.")
+                converted = [
+                    f"{name} ({pair['source_unit']} -> {pair['target_unit']})"
+                    for name, pair in unit_conversions.items()
+                    if name in variables and pair["source_unit"] != pair["target_unit"]
+                ]
+                detail = ("Compatible units; conversion will be applied to range checks: "
+                          + ", ".join(converted)) if converted else (
+                          "All selected units are recognized and dimensionally compatible; "
+                          "omitted source_unit means source values use the declared unit."
+                      )
+                record(check, "passed", detail)
             continue
         if not applicable:
             record(check, "inconclusive", f"No applicable CSV columns found for {kind}: {variables}")
@@ -213,6 +246,16 @@ def validate_physics_csv(
                        severity="high")
         elif kind == "physical_bounds":
             violations: list[str] = []
+            unresolved_units = [
+                name for name in applicable
+                if declared.get(name, {}).get("valid_range")
+                and name not in unit_conversions
+            ]
+            if unresolved_units:
+                record(check, "inconclusive",
+                       "Cannot safely apply canonical physical ranges because source/target units "
+                       f"are unknown or incompatible for: {', '.join(unresolved_units)}")
+                continue
             for name in applicable:
                 bounds = declared.get(name, {}).get("valid_range")
                 if not bounds or len(bounds) != 2:
@@ -220,8 +263,18 @@ def validate_physics_csv(
                 low, high = bounds
                 for row_number, row in enumerate(rows, start=2):
                     value = _number(row.get(name, ""))
-                    if value is not None and not low <= value <= high:
-                        violations.append(f"{name}@row{row_number}={value} outside [{low}, {high}]")
+                    if value is not None:
+                        units = unit_conversions.get(name)
+                        if units:
+                            try:
+                                value = convert_value(value, units["source_unit"], units["target_unit"])
+                            except ValueError:
+                                continue
+                        if not low <= value <= high:
+                            violations.append(
+                                f"{name}@row{row_number}={value} {declared[name].get('unit')} "
+                                f"outside [{low}, {high}]"
+                            )
                         if len(violations) >= 10:
                             break
             if not any(declared.get(name, {}).get("valid_range") for name in applicable):
@@ -263,7 +316,8 @@ def validate_physics_csv(
         "findings": findings,
         "evidence_refs": [evidence_ref],
         "overall_status": overall,
-        "summary": {"row_count": len(rows), "columns": headers, "rights_status": rights_status},
+        "summary": {"row_count": len(rows), "columns": headers, "rights_status": rights_status,
+                    "unit_conversions": unit_conversions},
         "provenance": {
             "input_fingerprints": {"dataset_sha256": digest, "profile_sha256": _sha256(profile_file)},
         },
