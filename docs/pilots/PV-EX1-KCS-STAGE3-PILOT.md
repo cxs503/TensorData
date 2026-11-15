@@ -4,7 +4,7 @@
 - usage_declaration: Real research-data acceptance workflow: the ship-performance platform's registered EX1/KCS prereg exports (13-variant resistance envelope + nominal Fn table) are accepted at column level by the TensorData PV chain before downstream use (CFD benchmarking, training-set admission, paper re-computation). Passing means: every numeric column is identified with a physically dimensioned unit and SI conversion factor, structure/axis/unit/range checks pass on the real bytes, and injected defects are detected. It does not mean the Holtrop-Mennen resistance values match towing-tank measurements.
 - permission_basis: `internal_consent`
 - product: `tensordata-physics-dataset-validator 0.2.0` (PV chain #7 foundation / #8 csv-validator / #9 unit-normalization + new column inference)
-- reviewed/declared commit: `ce4a0d1661bdbd23420c506fecec3d3123cbf250`
+- reviewed/declared commit: `18559035a5d8eb108055619f36191523e1a9364d`
 
 ## ① 案例介绍（物理背景 / 几何 / 参数）
 
@@ -177,8 +177,8 @@
 | 场景价值 | 真实科研数据文件（KCS EX1 预注册包）逐列验收，可直接交下游/审稿复算 |
 | 能力增量 | 新增 `tensordata.quality.fields`：字段识别 + 单位判定 + SI 系数 + 未知率闸门 |
 | 证据强度 | 输入指纹；两种独立物理闭合；4 类检查实跑；4 例负向注入全检出 |
-| 成本（墙钟） | 3.45 s |
-| 成本（CPU） | 1.88 s；读取 30228 B / 126 行 / 2 文件 |
+| 成本（墙钟） | 1.91 s |
+| 成本（CPU） | 2.00 s；读取 30228 B / 126 行 / 2 文件 |
 | 未测/欠账 | 独立复核（④）、`scenario_validated`（⑤）、模型精度对标（⑥ 已记账） |
 
 ---
