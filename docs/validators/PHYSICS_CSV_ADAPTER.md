@@ -42,7 +42,10 @@ The report follows the TensorBench validation-report structure and records datas
 
 1. CSV parsing loads rows into memory; large datasets need a streaming implementation.
 2. Time monotonicity assumes rows are ordered by time. It is not suitable for interleaved/unstructured samples without a grouping key.
-3. Unit checks verify declared metadata only; they do not validate physical dimensions or convert units.
+3. Unit checks verify *declared* metadata (dimension + conversion) only. Identifying a column's
+   field and unit from the export itself is a separate capability:
+   `docs/quality/column-identification.md` (`tensordata.quality.fields`), whose inferred profile
+   can be replayed through this adapter.
 4. Conservation checks need a domain-specific control volume, discretization, flux definitions and tolerance; they are intentionally not guessed.
 5. The profile's domain owner must approve physical ranges and assumptions before the profile is used as a training admission gate.
 
