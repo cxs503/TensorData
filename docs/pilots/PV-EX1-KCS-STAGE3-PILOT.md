@@ -184,3 +184,6 @@
 ---
 
 机器可读：`artifacts/pv-pilot/ex1_kcs/pilot_report.json`（overall_status=`inconclusive`）、`criteria_freeze.json`、`column_report.json`、`metrics.json`、`negative_cases.json`、`evidence_manifest.json`、`failure_records.json`；TensorBench 收集器 bundle 见 `runs/pv-pilot-ex1-kcs/collector/` 与 `collector_summary.json`（作者不自造收集器 bundle）。
+- reviewed/declared commit: `ce4a0d1661bdbd23420c506fecec3d3123cbf250`
+| 成本（墙钟） | 3.45 s |
+| 成本（CPU） | 1.88 s；读取 30228 B / 126 行 / 2 文件 |
