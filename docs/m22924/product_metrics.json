@@ -1,0 +1,73 @@
+{
+  "generated_at": "2026-11-16T04:45:43+00:00",
+  "host_python": "3.11.6",
+  "fixture": {
+    "command": "python3 scripts/pv_demo.py --input-dir /root/tp-agent/work/m22924/examples/pv-demo --repeat 1",
+    "runs": 5,
+    "wall_seconds": [
+      0.1411367803812027,
+      0.11605763994157314,
+      0.12279448099434376,
+      0.1343937385827303,
+      0.1466357596218586
+    ],
+    "wall_median": 0.1343937385827303,
+    "wall_min": 0.11605763994157314,
+    "wall_max": 0.1466357596218586,
+    "cpu_seconds": [
+      0.139391,
+      0.114766,
+      0.121841,
+      0.132355,
+      0.14485899999999993
+    ],
+    "cpu_median": 0.132355,
+    "cpu_source": "resource.getrusage(RUSAGE_CHILDREN) around the child process (measured here, not from the platform ledger)",
+    "unique_result_digests": [
+      "d8bc706997f308e1764f859b66f569a5fe9f0e26525cfc685e32dff62621fdfe"
+    ],
+    "deterministic": true
+  },
+  "cost": {
+    "status": "not_measured",
+    "reason": "no metered_usage / compute_ledger rows exist for these missions (the platform ledgers do not yet meter this product line); token and compute cost are therefore reported from the local rusage measurement in this file, never estimated",
+    "missions": [
+      22061,
+      22508,
+      22509,
+      22510,
+      22924
+    ],
+    "queries": [
+      "metered_usage by mission_id",
+      "compute_ledger by mission_id"
+    ]
+  },
+  "real": {
+    "command": "python3 scripts/pv_demo.py --input-dir /root/ship-performance-platform-incoming/ship-performance-platform/docs/prereg/ex1_kcs --repeat 1",
+    "runs": 5,
+    "wall_seconds": [
+      0.17647450044751167,
+      0.180959340184927,
+      0.1673099286854267,
+      0.1688366699963808,
+      0.18271245993673801
+    ],
+    "wall_median": 0.17647450044751167,
+    "wall_min": 0.1673099286854267,
+    "wall_max": 0.18271245993673801,
+    "cpu_seconds": [
+      0.17486899999999994,
+      0.179674,
+      0.16620499999999996,
+      0.167534,
+      0.18119100000000005
+    ],
+    "cpu_median": 0.17486899999999994,
+    "cpu_source": "resource.getrusage(RUSAGE_CHILDREN) around the child process (measured here, not from the platform ledger)",
+    "unique_result_digests": [
+      "f2ca41a96fb5713eb15d7a1918fcf4cc6ae4271863bef290e0dff794c08531c4"
+    ],
+    "deterministic": true
+  }
+}
