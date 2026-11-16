@@ -1,0 +1,1501 @@
+{
+  "product": {
+    "product_id": "physics-dataset-validator",
+    "product_version": "1.0.0",
+    "report_schema_version": "0.1.0"
+  },
+  "input_dir": "ship-performance-platform docs/prereg/ex1_kcs (internal_consent, fingerprints only)",
+  "input_class": "caller_supplied",
+  "out_dir": "artifacts/pv-demo/docs-kcs",
+  "generated_at": "2026-11-16T04:45:43+00:00",
+  "datasets": [
+    {
+      "file": "envelope_v1.csv",
+      "sha256": "c6b14731a80de108253ed50f89d644068fb188276fe8f09351bfb6f060d8bfcd",
+      "bytes": 27501,
+      "rows": 117,
+      "columns": [
+        "variant",
+        "group",
+        "Fn",
+        "V_kn",
+        "Re",
+        "CF",
+        "one_plus_k",
+        "CR",
+        "CA",
+        "Ct",
+        "Rt_kN",
+        "Pe_kW",
+        "iE_deg",
+        "S"
+      ],
+      "numeric_columns": 12,
+      "identified_columns": 12,
+      "unknown_columns": [],
+      "unknown_rate": 0.0,
+      "unknown_rate_limit": 0.1,
+      "meets_unknown_limit": true,
+      "group_column": "variant",
+      "axis_column": "Fn",
+      "grouped_axis_monotonic": true,
+      "file_level_axis_monotonic": false,
+      "overall_status": "passed",
+      "verdict": "passed",
+      "verdict_notes": [],
+      "checks": [
+        {
+          "check_id": "dataset.finite_values",
+          "state": "passed",
+          "required": true
+        },
+        {
+          "check_id": "dataset.units_resolvable",
+          "state": "passed",
+          "required": true
+        },
+        {
+          "check_id": "dataset.physical_bounds",
+          "state": "passed",
+          "required": true
+        },
+        {
+          "check_id": "dataset.axis_monotonic_within_groups.Fn",
+          "state": "passed",
+          "required": true
+        }
+      ],
+      "columns_report": [
+        {
+          "column": "variant",
+          "status": "not_numeric",
+          "field": null,
+          "source_unit": null,
+          "canonical_unit": null,
+          "si_scale": null,
+          "confidence": null,
+          "basis": null
+        },
+        {
+          "column": "group",
+          "status": "not_numeric",
+          "field": null,
+          "source_unit": null,
+          "canonical_unit": null,
+          "si_scale": null,
+          "confidence": null,
+          "basis": null
+        },
+        {
+          "column": "Fn",
+          "status": "identified",
+          "field": "Fn",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "V_kn",
+          "status": "identified",
+          "field": "V",
+          "source_unit": "knot",
+          "canonical_unit": "m/s",
+          "si_scale": 0.5144444444444445,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kn",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "Re",
+          "status": "identified",
+          "field": "Re",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "CF",
+          "status": "identified",
+          "field": "CF",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "one_plus_k",
+          "status": "identified",
+          "field": "one_plus_k",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "CR",
+          "status": "identified",
+          "field": "CR",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "CA",
+          "status": "identified",
+          "field": "CA",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "Ct",
+          "status": "identified",
+          "field": "Ct",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "Rt_kN",
+          "status": "identified",
+          "field": "Rt",
+          "source_unit": "kn",
+          "canonical_unit": "N",
+          "si_scale": 1000.0,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kN",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "Pe_kW",
+          "status": "identified",
+          "field": "Pe",
+          "source_unit": "kw",
+          "canonical_unit": "W",
+          "si_scale": 1000.0,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kW",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "iE_deg",
+          "status": "identified",
+          "field": "iE",
+          "source_unit": "deg",
+          "canonical_unit": "rad",
+          "si_scale": 0.017453292519943295,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:deg",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "S",
+          "status": "identified",
+          "field": "S",
+          "source_unit": "m2",
+          "canonical_unit": "m2",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        }
+      ],
+      "review_required_columns": [
+        "Fn",
+        "Re",
+        "CF",
+        "one_plus_k",
+        "CR",
+        "CA",
+        "Ct",
+        "S"
+      ],
+      "automation_rate": 0.33333333333333337,
+      "closures": {
+        "implied_density_kg_m3": {
+          "mean": 1024.9982289424495,
+          "relative_spread": 6.654850779922617e-16,
+          "inside_window": true
+        },
+        "power_identity_relative_deviation": 8.639316322064235e-07
+      },
+      "baseline": {
+        "arm": "case_insensitive_suffix_lookup",
+        "mismatched_columns": [
+          {
+            "column": "V_kn",
+            "pv_source_unit": "knot",
+            "pv_dimension": "velocity",
+            "baseline_unit": "kn",
+            "baseline_dimension": "force"
+          },
+          {
+            "column": "one_plus_k",
+            "pv_source_unit": "1",
+            "pv_dimension": "dimensionless",
+            "baseline_unit": "k",
+            "baseline_dimension": "temperature"
+          }
+        ],
+        "mismatch_count": 2,
+        "verdict": "failed",
+        "failed_checks": [
+          "dataset.units_resolvable"
+        ],
+        "hand_written_profile_fields": 24,
+        "generated_profile_fields": 0
+      },
+      "profile": {
+        "profile_id": "pv-demo-envelope_v1",
+        "version": "1.0.0",
+        "domain": "ship_resistance",
+        "variables": [
+          {
+            "name": "Fn",
+            "role": "independent",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              1.5
+            ]
+          },
+          {
+            "name": "V_kn",
+            "role": "independent",
+            "unit": "m/s",
+            "source_unit": "knot",
+            "valid_range": [
+              0.0,
+              40.0
+            ]
+          },
+          {
+            "name": "Re",
+            "role": "derived",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              10000000000000.0
+            ]
+          },
+          {
+            "name": "CF",
+            "role": "derived",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              0.02
+            ]
+          },
+          {
+            "name": "one_plus_k",
+            "role": "constant",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              1.0,
+              3.0
+            ]
+          },
+          {
+            "name": "CR",
+            "role": "derived",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              0.02
+            ]
+          },
+          {
+            "name": "CA",
+            "role": "derived",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              0.005
+            ]
+          },
+          {
+            "name": "Ct",
+            "role": "derived",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              0.05
+            ]
+          },
+          {
+            "name": "Rt_kN",
+            "role": "output",
+            "unit": "N",
+            "source_unit": "kn",
+            "valid_range": [
+              0.0,
+              50000000.0
+            ]
+          },
+          {
+            "name": "Pe_kW",
+            "role": "output",
+            "unit": "W",
+            "source_unit": "kw",
+            "valid_range": [
+              0.0,
+              500000000.0
+            ]
+          },
+          {
+            "name": "iE_deg",
+            "role": "constant",
+            "unit": "rad",
+            "source_unit": "deg",
+            "valid_range": [
+              0.0,
+              1.5707963267948966
+            ]
+          },
+          {
+            "name": "S",
+            "role": "constant",
+            "unit": "m2",
+            "source_unit": "m2",
+            "valid_range": [
+              1.0,
+              1000000.0
+            ]
+          }
+        ],
+        "checks": [
+          {
+            "check_id": "dataset.finite_values",
+            "kind": "finite_values",
+            "required": true,
+            "applicability": "all recognised columns present and finite",
+            "variables": [
+              "Fn",
+              "V_kn",
+              "Re",
+              "CF",
+              "one_plus_k",
+              "CR",
+              "CA",
+              "Ct",
+              "Rt_kN",
+              "Pe_kW",
+              "iE_deg",
+              "S"
+            ]
+          },
+          {
+            "check_id": "dataset.units_resolvable",
+            "kind": "unit_consistency",
+            "required": true,
+            "applicability": "declared source unit convertible to canonical SI unit",
+            "variables": [
+              "Fn",
+              "V_kn",
+              "Re",
+              "CF",
+              "one_plus_k",
+              "CR",
+              "CA",
+              "Ct",
+              "Rt_kN",
+              "Pe_kW",
+              "iE_deg",
+              "S"
+            ]
+          },
+          {
+            "check_id": "dataset.physical_bounds",
+            "kind": "physical_bounds",
+            "required": true,
+            "applicability": "canonical SI values inside declared sanity range",
+            "variables": [
+              "Fn",
+              "V_kn",
+              "Re",
+              "CF",
+              "one_plus_k",
+              "CR",
+              "CA",
+              "Ct",
+              "Rt_kN",
+              "Pe_kW",
+              "iE_deg",
+              "S"
+            ]
+          }
+        ],
+        "rights_policy": "allow_internal_restricted",
+        "notes": {
+          "generated_by": "tensordata.quality.fields.build_profile",
+          "unknown_columns": [],
+          "unit_conflict_columns": []
+        }
+      },
+      "report": {
+        "schema_version": "0.1.0",
+        "product_id": "physics-dataset-validator",
+        "product_version": "1.0.0",
+        "run_id": "pdv-c6b14731a80de108",
+        "created_at": "2026-11-16T04:45:43+00:00",
+        "input_refs": [
+          "/root/ship-performance-platform-incoming/ship-performance-platform/docs/prereg/ex1_kcs/envelope_v1.csv",
+          "/root/tp-agent/work/m22924/artifacts/pv-demo/docs-kcs/repeat1/envelope_v1.profile.json"
+        ],
+        "input_fingerprints": {
+          "dataset_sha256": "c6b14731a80de108253ed50f89d644068fb188276fe8f09351bfb6f060d8bfcd",
+          "profile_sha256": "e9aafaa3d1004cedbb3ca9d0eaff1df938b0a0c33e8a01ba4f79028aeb259b45"
+        },
+        "checks": [
+          {
+            "check_id": "dataset.finite_values",
+            "version": "1.0.0",
+            "method": "deterministic_rule",
+            "state": "passed",
+            "required": true,
+            "details": "All 117 rows contain finite numeric values for ['Fn', 'V_kn', 'Re', 'CF', 'one_plus_k', 'CR', 'CA', 'Ct', 'Rt_kN', 'Pe_kW', 'iE_deg', 'S']."
+          },
+          {
+            "check_id": "dataset.units_resolvable",
+            "version": "1.0.0",
+            "method": "deterministic_rule",
+            "state": "passed",
+            "required": true,
+            "details": "Compatible units; conversion will be applied to range checks: V_kn (knot -> m/s), Rt_kN (kn -> N), Pe_kW (kw -> W), iE_deg (deg -> rad)"
+          },
+          {
+            "check_id": "dataset.physical_bounds",
+            "version": "1.0.0",
+            "method": "deterministic_rule",
+            "state": "passed",
+            "required": true,
+            "details": "All selected values satisfy declared valid_range."
+          },
+          {
+            "check_id": "dataset.axis_monotonic_within_groups.Fn",
+            "version": "1.0.0",
+            "method": "deterministic_rule",
+            "state": "passed",
+            "required": true,
+            "details": "axis Fn strictly increasing inside each variant group; whole-file monotonic=False"
+          }
+        ],
+        "findings": [],
+        "evidence_refs": [
+          "file:sha256:c6b14731a80de108253ed50f89d644068fb188276fe8f09351bfb6f060d8bfcd"
+        ],
+        "overall_status": "passed",
+        "summary": {
+          "row_count": 117,
+          "columns": [
+            "variant",
+            "group",
+            "Fn",
+            "V_kn",
+            "Re",
+            "CF",
+            "one_plus_k",
+            "CR",
+            "CA",
+            "Ct",
+            "Rt_kN",
+            "Pe_kW",
+            "iE_deg",
+            "S"
+          ],
+          "rights_status": "unknown",
+          "unit_conversions": {
+            "Fn": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "V_kn": {
+              "source_unit": "knot",
+              "target_unit": "m/s"
+            },
+            "Re": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "CF": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "one_plus_k": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "CR": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "CA": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "Ct": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "Rt_kN": {
+              "source_unit": "kn",
+              "target_unit": "N"
+            },
+            "Pe_kW": {
+              "source_unit": "kw",
+              "target_unit": "W"
+            },
+            "iE_deg": {
+              "source_unit": "deg",
+              "target_unit": "rad"
+            },
+            "S": {
+              "source_unit": "m2",
+              "target_unit": "m2"
+            }
+          }
+        },
+        "provenance": {
+          "input_fingerprints": {
+            "dataset_sha256": "c6b14731a80de108253ed50f89d644068fb188276fe8f09351bfb6f060d8bfcd",
+            "profile_sha256": "e9aafaa3d1004cedbb3ca9d0eaff1df938b0a0c33e8a01ba4f79028aeb259b45"
+          }
+        }
+      },
+      "timing_seconds": {
+        "identify": 0.004033809527754784,
+        "validate": 0.0055207014083862305,
+        "total": 0.013683570548892021
+      }
+    },
+    {
+      "file": "table_v1.csv",
+      "sha256": "9126738f02fb1fd69f07921173f59f71476e54eaaafc1c9f73a3204bdbb6ab56",
+      "bytes": 2727,
+      "rows": 9,
+      "columns": [
+        "Fn",
+        "V_kn",
+        "V_ms",
+        "Re",
+        "CF",
+        "one_plus_k",
+        "CR",
+        "CA",
+        "Ct",
+        "Rt_kN",
+        "Pe_kW",
+        "RF_kN",
+        "Rw_kN",
+        "RB_kN",
+        "Rtr_kN",
+        "RA_kN",
+        "S"
+      ],
+      "numeric_columns": 17,
+      "identified_columns": 17,
+      "unknown_columns": [],
+      "unknown_rate": 0.0,
+      "unknown_rate_limit": 0.1,
+      "meets_unknown_limit": true,
+      "group_column": null,
+      "axis_column": "Fn",
+      "grouped_axis_monotonic": null,
+      "file_level_axis_monotonic": true,
+      "overall_status": "passed",
+      "verdict": "passed",
+      "verdict_notes": [],
+      "checks": [
+        {
+          "check_id": "dataset.finite_values",
+          "state": "passed",
+          "required": true
+        },
+        {
+          "check_id": "dataset.units_resolvable",
+          "state": "passed",
+          "required": true
+        },
+        {
+          "check_id": "dataset.physical_bounds",
+          "state": "passed",
+          "required": true
+        },
+        {
+          "check_id": "dataset.axis_monotonic.Fn",
+          "state": "passed",
+          "required": true
+        }
+      ],
+      "columns_report": [
+        {
+          "column": "Fn",
+          "status": "identified",
+          "field": "Fn",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "V_kn",
+          "status": "identified",
+          "field": "V",
+          "source_unit": "knot",
+          "canonical_unit": "m/s",
+          "si_scale": 0.5144444444444445,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kn",
+            "magnitude_within_declared_range",
+            "cross_column_agreement:V_ms"
+          ]
+        },
+        {
+          "column": "V_ms",
+          "status": "identified",
+          "field": "V",
+          "source_unit": "m/s",
+          "canonical_unit": "m/s",
+          "si_scale": 1.0,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:ms",
+            "magnitude_within_declared_range",
+            "cross_column_agreement:V_kn"
+          ]
+        },
+        {
+          "column": "Re",
+          "status": "identified",
+          "field": "Re",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "CF",
+          "status": "identified",
+          "field": "CF",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "one_plus_k",
+          "status": "identified",
+          "field": "one_plus_k",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "CR",
+          "status": "identified",
+          "field": "CR",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "CA",
+          "status": "identified",
+          "field": "CA",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "Ct",
+          "status": "identified",
+          "field": "Ct",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "Rt_kN",
+          "status": "identified",
+          "field": "Rt",
+          "source_unit": "kn",
+          "canonical_unit": "N",
+          "si_scale": 1000.0,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kN",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "Pe_kW",
+          "status": "identified",
+          "field": "Pe",
+          "source_unit": "kw",
+          "canonical_unit": "W",
+          "si_scale": 1000.0,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kW",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "RF_kN",
+          "status": "identified",
+          "field": "Rf",
+          "source_unit": "kn",
+          "canonical_unit": "N",
+          "si_scale": 1000.0,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kN",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "Rw_kN",
+          "status": "identified",
+          "field": "Rw",
+          "source_unit": "kn",
+          "canonical_unit": "N",
+          "si_scale": 1000.0,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kN",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "RB_kN",
+          "status": "identified",
+          "field": "RB",
+          "source_unit": "kn",
+          "canonical_unit": "N",
+          "si_scale": 1000.0,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kN",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "Rtr_kN",
+          "status": "identified",
+          "field": "Rtr",
+          "source_unit": "kn",
+          "canonical_unit": "N",
+          "si_scale": 1000.0,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kN",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "RA_kN",
+          "status": "identified",
+          "field": "RA",
+          "source_unit": "kn",
+          "canonical_unit": "N",
+          "si_scale": 1000.0,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kN",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "S",
+          "status": "identified",
+          "field": "S",
+          "source_unit": "m2",
+          "canonical_unit": "m2",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        }
+      ],
+      "review_required_columns": [
+        "Fn",
+        "Re",
+        "CF",
+        "one_plus_k",
+        "CR",
+        "CA",
+        "Ct",
+        "S"
+      ],
+      "automation_rate": 0.5294117647058824,
+      "closures": {
+        "implied_density_kg_m3": {
+          "mean": 1025.0,
+          "relative_spread": 4.4365595208435524e-16,
+          "inside_window": true
+        },
+        "power_identity_relative_deviation": 0.0,
+        "speed_cross_column_relative_deviation": 8.63930885702129e-07
+      },
+      "baseline": {
+        "arm": "case_insensitive_suffix_lookup",
+        "mismatched_columns": [
+          {
+            "column": "V_kn",
+            "pv_source_unit": "knot",
+            "pv_dimension": "velocity",
+            "baseline_unit": "kn",
+            "baseline_dimension": "force"
+          },
+          {
+            "column": "V_ms",
+            "pv_source_unit": "m/s",
+            "pv_dimension": "velocity",
+            "baseline_unit": "ms",
+            "baseline_dimension": "time"
+          },
+          {
+            "column": "one_plus_k",
+            "pv_source_unit": "1",
+            "pv_dimension": "dimensionless",
+            "baseline_unit": "k",
+            "baseline_dimension": "temperature"
+          }
+        ],
+        "mismatch_count": 3,
+        "verdict": "failed",
+        "failed_checks": [
+          "dataset.units_resolvable"
+        ],
+        "hand_written_profile_fields": 34,
+        "generated_profile_fields": 0
+      },
+      "profile": {
+        "profile_id": "pv-demo-table_v1",
+        "version": "1.0.0",
+        "domain": "ship_resistance",
+        "variables": [
+          {
+            "name": "Fn",
+            "role": "independent",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              1.5
+            ]
+          },
+          {
+            "name": "V_kn",
+            "role": "independent",
+            "unit": "m/s",
+            "source_unit": "knot",
+            "valid_range": [
+              0.0,
+              40.0
+            ]
+          },
+          {
+            "name": "V_ms",
+            "role": "independent",
+            "unit": "m/s",
+            "source_unit": "m/s",
+            "valid_range": [
+              0.0,
+              40.0
+            ]
+          },
+          {
+            "name": "Re",
+            "role": "derived",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              10000000000000.0
+            ]
+          },
+          {
+            "name": "CF",
+            "role": "derived",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              0.02
+            ]
+          },
+          {
+            "name": "one_plus_k",
+            "role": "constant",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              1.0,
+              3.0
+            ]
+          },
+          {
+            "name": "CR",
+            "role": "derived",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              0.02
+            ]
+          },
+          {
+            "name": "CA",
+            "role": "derived",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              0.005
+            ]
+          },
+          {
+            "name": "Ct",
+            "role": "derived",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              0.05
+            ]
+          },
+          {
+            "name": "Rt_kN",
+            "role": "output",
+            "unit": "N",
+            "source_unit": "kn",
+            "valid_range": [
+              0.0,
+              50000000.0
+            ]
+          },
+          {
+            "name": "Pe_kW",
+            "role": "output",
+            "unit": "W",
+            "source_unit": "kw",
+            "valid_range": [
+              0.0,
+              500000000.0
+            ]
+          },
+          {
+            "name": "RF_kN",
+            "role": "output",
+            "unit": "N",
+            "source_unit": "kn",
+            "valid_range": [
+              0.0,
+              50000000.0
+            ]
+          },
+          {
+            "name": "Rw_kN",
+            "role": "output",
+            "unit": "N",
+            "source_unit": "kn",
+            "valid_range": [
+              0.0,
+              50000000.0
+            ]
+          },
+          {
+            "name": "RB_kN",
+            "role": "output",
+            "unit": "N",
+            "source_unit": "kn",
+            "valid_range": [
+              0.0,
+              50000000.0
+            ]
+          },
+          {
+            "name": "Rtr_kN",
+            "role": "output",
+            "unit": "N",
+            "source_unit": "kn",
+            "valid_range": [
+              0.0,
+              50000000.0
+            ]
+          },
+          {
+            "name": "RA_kN",
+            "role": "output",
+            "unit": "N",
+            "source_unit": "kn",
+            "valid_range": [
+              0.0,
+              50000000.0
+            ]
+          },
+          {
+            "name": "S",
+            "role": "constant",
+            "unit": "m2",
+            "source_unit": "m2",
+            "valid_range": [
+              1.0,
+              1000000.0
+            ]
+          }
+        ],
+        "checks": [
+          {
+            "check_id": "dataset.finite_values",
+            "kind": "finite_values",
+            "required": true,
+            "applicability": "all recognised columns present and finite",
+            "variables": [
+              "Fn",
+              "V_kn",
+              "V_ms",
+              "Re",
+              "CF",
+              "one_plus_k",
+              "CR",
+              "CA",
+              "Ct",
+              "Rt_kN",
+              "Pe_kW",
+              "RF_kN",
+              "Rw_kN",
+              "RB_kN",
+              "Rtr_kN",
+              "RA_kN",
+              "S"
+            ]
+          },
+          {
+            "check_id": "dataset.units_resolvable",
+            "kind": "unit_consistency",
+            "required": true,
+            "applicability": "declared source unit convertible to canonical SI unit",
+            "variables": [
+              "Fn",
+              "V_kn",
+              "V_ms",
+              "Re",
+              "CF",
+              "one_plus_k",
+              "CR",
+              "CA",
+              "Ct",
+              "Rt_kN",
+              "Pe_kW",
+              "RF_kN",
+              "Rw_kN",
+              "RB_kN",
+              "Rtr_kN",
+              "RA_kN",
+              "S"
+            ]
+          },
+          {
+            "check_id": "dataset.physical_bounds",
+            "kind": "physical_bounds",
+            "required": true,
+            "applicability": "canonical SI values inside declared sanity range",
+            "variables": [
+              "Fn",
+              "V_kn",
+              "V_ms",
+              "Re",
+              "CF",
+              "one_plus_k",
+              "CR",
+              "CA",
+              "Ct",
+              "Rt_kN",
+              "Pe_kW",
+              "RF_kN",
+              "Rw_kN",
+              "RB_kN",
+              "Rtr_kN",
+              "RA_kN",
+              "S"
+            ]
+          },
+          {
+            "check_id": "dataset.axis_monotonic.Fn",
+            "kind": "monotonic_axis",
+            "required": true,
+            "applicability": "rows ordered by the independent variable",
+            "variables": [
+              "Fn"
+            ]
+          }
+        ],
+        "rights_policy": "allow_internal_restricted",
+        "notes": {
+          "generated_by": "tensordata.quality.fields.build_profile",
+          "unknown_columns": [],
+          "unit_conflict_columns": []
+        }
+      },
+      "report": {
+        "schema_version": "0.1.0",
+        "product_id": "physics-dataset-validator",
+        "product_version": "1.0.0",
+        "run_id": "pdv-9126738f02fb1fd6",
+        "created_at": "2026-11-16T04:45:43+00:00",
+        "input_refs": [
+          "/root/ship-performance-platform-incoming/ship-performance-platform/docs/prereg/ex1_kcs/table_v1.csv",
+          "/root/tp-agent/work/m22924/artifacts/pv-demo/docs-kcs/repeat1/table_v1.profile.json"
+        ],
+        "input_fingerprints": {
+          "dataset_sha256": "9126738f02fb1fd69f07921173f59f71476e54eaaafc1c9f73a3204bdbb6ab56",
+          "profile_sha256": "7fe98dfbfe99251ab4172b776643fbc43dab0e4eaf77f0e569f177c8aec089af"
+        },
+        "checks": [
+          {
+            "check_id": "dataset.finite_values",
+            "version": "1.0.0",
+            "method": "deterministic_rule",
+            "state": "passed",
+            "required": true,
+            "details": "All 9 rows contain finite numeric values for ['Fn', 'V_kn', 'V_ms', 'Re', 'CF', 'one_plus_k', 'CR', 'CA', 'Ct', 'Rt_kN', 'Pe_kW', 'RF_kN', 'Rw_kN', 'RB_kN', 'Rtr_kN', 'RA_kN', 'S']."
+          },
+          {
+            "check_id": "dataset.units_resolvable",
+            "version": "1.0.0",
+            "method": "deterministic_rule",
+            "state": "passed",
+            "required": true,
+            "details": "Compatible units; conversion will be applied to range checks: V_kn (knot -> m/s), Rt_kN (kn -> N), Pe_kW (kw -> W), RF_kN (kn -> N), Rw_kN (kn -> N), RB_kN (kn -> N), Rtr_kN (kn -> N), RA_kN (kn -> N)"
+          },
+          {
+            "check_id": "dataset.physical_bounds",
+            "version": "1.0.0",
+            "method": "deterministic_rule",
+            "state": "passed",
+            "required": true,
+            "details": "All selected values satisfy declared valid_range."
+          },
+          {
+            "check_id": "dataset.axis_monotonic.Fn",
+            "version": "1.0.0",
+            "method": "deterministic_rule",
+            "state": "passed",
+            "required": true,
+            "details": "Axis Fn is strictly increasing after collapsing adjacent repeats."
+          }
+        ],
+        "findings": [],
+        "evidence_refs": [
+          "file:sha256:9126738f02fb1fd69f07921173f59f71476e54eaaafc1c9f73a3204bdbb6ab56"
+        ],
+        "overall_status": "passed",
+        "summary": {
+          "row_count": 9,
+          "columns": [
+            "Fn",
+            "V_kn",
+            "V_ms",
+            "Re",
+            "CF",
+            "one_plus_k",
+            "CR",
+            "CA",
+            "Ct",
+            "Rt_kN",
+            "Pe_kW",
+            "RF_kN",
+            "Rw_kN",
+            "RB_kN",
+            "Rtr_kN",
+            "RA_kN",
+            "S"
+          ],
+          "rights_status": "unknown",
+          "unit_conversions": {
+            "Fn": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "V_kn": {
+              "source_unit": "knot",
+              "target_unit": "m/s"
+            },
+            "V_ms": {
+              "source_unit": "m/s",
+              "target_unit": "m/s"
+            },
+            "Re": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "CF": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "one_plus_k": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "CR": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "CA": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "Ct": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "Rt_kN": {
+              "source_unit": "kn",
+              "target_unit": "N"
+            },
+            "Pe_kW": {
+              "source_unit": "kw",
+              "target_unit": "W"
+            },
+            "RF_kN": {
+              "source_unit": "kn",
+              "target_unit": "N"
+            },
+            "Rw_kN": {
+              "source_unit": "kn",
+              "target_unit": "N"
+            },
+            "RB_kN": {
+              "source_unit": "kn",
+              "target_unit": "N"
+            },
+            "Rtr_kN": {
+              "source_unit": "kn",
+              "target_unit": "N"
+            },
+            "RA_kN": {
+              "source_unit": "kn",
+              "target_unit": "N"
+            },
+            "S": {
+              "source_unit": "m2",
+              "target_unit": "m2"
+            }
+          }
+        },
+        "provenance": {
+          "input_fingerprints": {
+            "dataset_sha256": "9126738f02fb1fd69f07921173f59f71476e54eaaafc1c9f73a3204bdbb6ab56",
+            "profile_sha256": "7fe98dfbfe99251ab4172b776643fbc43dab0e4eaf77f0e569f177c8aec089af"
+          }
+        }
+      },
+      "timing_seconds": {
+        "identify": 0.0006867405027151108,
+        "validate": 0.0014450307935476303,
+        "total": 0.004568139091134071
+      }
+    }
+  ],
+  "injections": [
+    {
+      "case": "out_of_range_value",
+      "injection": "Rt_kN x100",
+      "verdict": "failed",
+      "detected": true,
+      "channel": "dataset.physical_bounds",
+      "failed_checks": [
+        "dataset.physical_bounds"
+      ],
+      "closure_implied_density": {
+        "mean": 102499.82289430336,
+        "relative_spread": 3.534985749217894e-11,
+        "inside_window": false
+      },
+      "closure_detected": true
+    },
+    {
+      "case": "moderate_scale_error",
+      "injection": "Rt_kN x10",
+      "verdict": "passed",
+      "detected": false,
+      "channel": "dataset.physical_bounds",
+      "failed_checks": [],
+      "closure_implied_density": {
+        "mean": 10249.982289455735,
+        "relative_spread": 4.1751664225938676e-10,
+        "inside_window": false
+      },
+      "closure_detected": true
+    },
+    {
+      "case": "unit_mislabel_in_profile",
+      "injection": "V_kn -> kn",
+      "verdict": "failed",
+      "detected": true,
+      "channel": "dataset.units_resolvable",
+      "failed_checks": [
+        "dataset.units_resolvable"
+      ]
+    },
+    {
+      "case": "unknown_column_gate",
+      "injection": "CF -> XX_mystery",
+      "verdict": "passed",
+      "detected": false,
+      "channel": "unknown_rate_gate",
+      "unknown_rate": 0.08333333333333333,
+      "unknown_rate_limit": 0.1
+    },
+    {
+      "case": "non_finite_cell",
+      "injection": "Ct row 1 blank",
+      "verdict": "failed",
+      "detected": true,
+      "channel": "dataset.finite_values",
+      "failed_checks": [
+        "dataset.finite_values"
+      ]
+    }
+  ],
+  "timing": {
+    "repeats": [
+      {
+        "repeat": 1,
+        "wall_total": 0.05539902113378048,
+        "identify": 0.004720550030469894,
+        "validate": 0.006965732201933861
+      }
+    ],
+    "wall_median": 0.05539902113378048,
+    "wall_min": 0.05539902113378048,
+    "wall_max": 0.05539902113378048,
+    "files": 2
+  },
+  "automation": {
+    "numeric_columns": 29,
+    "identified_columns": 29,
+    "review_required_columns": 16,
+    "cli_interventions_required": 0,
+    "manual_profile_fields_written": 0
+  },
+  "result_digest": "f2ca41a96fb5713eb15d7a1918fcf4cc6ae4271863bef290e0dff794c08531c4",
+  "command": "python3 scripts/pv_demo.py --input-dir /root/ship-performance-platform-incoming/ship-performance-platform/docs/prereg/ex1_kcs"
+}
