@@ -1,0 +1,561 @@
+{
+  "product": {
+    "product_id": "physics-dataset-validator",
+    "product_version": "1.0.0",
+    "report_schema_version": "0.1.0"
+  },
+  "input_dir": "/srv/tensor/agent/work/m22924/examples/pv-demo",
+  "input_class": "bundled_demo_fixture",
+  "out_dir": "artifacts/pv-demo/docs-fixture",
+  "generated_at": "2026-11-16T04:45:43+00:00",
+  "datasets": [
+    {
+      "file": "demo-resistance.csv",
+      "sha256": "355786ea47c598d4b9ad3afc3a891b29797accf6916e44c3f1150dc6e442a57b",
+      "bytes": 559,
+      "rows": 6,
+      "columns": [
+        "Fn",
+        "V_kn",
+        "Rt_kN",
+        "Pe_kW",
+        "Ct",
+        "CF",
+        "S",
+        "iE_deg"
+      ],
+      "numeric_columns": 8,
+      "identified_columns": 8,
+      "unknown_columns": [],
+      "unknown_rate": 0.0,
+      "unknown_rate_limit": 0.1,
+      "meets_unknown_limit": true,
+      "group_column": null,
+      "axis_column": "Fn",
+      "grouped_axis_monotonic": null,
+      "file_level_axis_monotonic": true,
+      "overall_status": "passed",
+      "verdict": "passed",
+      "verdict_notes": [],
+      "checks": [
+        {
+          "check_id": "dataset.finite_values",
+          "state": "passed",
+          "required": true
+        },
+        {
+          "check_id": "dataset.units_resolvable",
+          "state": "passed",
+          "required": true
+        },
+        {
+          "check_id": "dataset.physical_bounds",
+          "state": "passed",
+          "required": true
+        },
+        {
+          "check_id": "dataset.axis_monotonic.Fn",
+          "state": "passed",
+          "required": true
+        }
+      ],
+      "columns_report": [
+        {
+          "column": "Fn",
+          "status": "identified",
+          "field": "Fn",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "V_kn",
+          "status": "identified",
+          "field": "V",
+          "source_unit": "knot",
+          "canonical_unit": "m/s",
+          "si_scale": 0.5144444444444445,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kn",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "Rt_kN",
+          "status": "identified",
+          "field": "Rt",
+          "source_unit": "kn",
+          "canonical_unit": "N",
+          "si_scale": 1000.0,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kN",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "Pe_kW",
+          "status": "identified",
+          "field": "Pe",
+          "source_unit": "kw",
+          "canonical_unit": "W",
+          "si_scale": 1000.0,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:kW",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "Ct",
+          "status": "identified",
+          "field": "Ct",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "CF",
+          "status": "identified",
+          "field": "CF",
+          "source_unit": "1",
+          "canonical_unit": "1",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "S",
+          "status": "identified",
+          "field": "S",
+          "source_unit": "m2",
+          "canonical_unit": "m2",
+          "si_scale": 1.0,
+          "confidence": "medium",
+          "basis": [
+            "symbol_table",
+            "canonical_unit_assumed",
+            "magnitude_within_declared_range"
+          ]
+        },
+        {
+          "column": "iE_deg",
+          "status": "identified",
+          "field": "iE",
+          "source_unit": "deg",
+          "canonical_unit": "rad",
+          "si_scale": 0.017453292519943295,
+          "confidence": "high",
+          "basis": [
+            "symbol_table",
+            "unit_suffix:deg",
+            "magnitude_within_declared_range"
+          ]
+        }
+      ],
+      "review_required_columns": [
+        "Fn",
+        "Ct",
+        "CF",
+        "S"
+      ],
+      "automation_rate": 0.5,
+      "closures": {
+        "implied_density_kg_m3": {
+          "mean": 1024.9999898121644,
+          "relative_spread": 1.1888258803498161e-07,
+          "inside_window": true
+        },
+        "power_identity_relative_deviation": 3.539660699496856e-08
+      },
+      "baseline": {
+        "arm": "case_insensitive_suffix_lookup",
+        "mismatched_columns": [
+          {
+            "column": "V_kn",
+            "pv_source_unit": "knot",
+            "pv_dimension": "velocity",
+            "baseline_unit": "kn",
+            "baseline_dimension": "force"
+          }
+        ],
+        "mismatch_count": 1,
+        "verdict": "failed",
+        "failed_checks": [
+          "dataset.units_resolvable"
+        ],
+        "hand_written_profile_fields": 16,
+        "generated_profile_fields": 0
+      },
+      "profile": {
+        "profile_id": "pv-demo-demo-resistance",
+        "version": "1.0.0",
+        "domain": "ship_resistance",
+        "variables": [
+          {
+            "name": "Fn",
+            "role": "independent",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              1.5
+            ]
+          },
+          {
+            "name": "V_kn",
+            "role": "independent",
+            "unit": "m/s",
+            "source_unit": "knot",
+            "valid_range": [
+              0.0,
+              40.0
+            ]
+          },
+          {
+            "name": "Rt_kN",
+            "role": "output",
+            "unit": "N",
+            "source_unit": "kn",
+            "valid_range": [
+              0.0,
+              50000000.0
+            ]
+          },
+          {
+            "name": "Pe_kW",
+            "role": "output",
+            "unit": "W",
+            "source_unit": "kw",
+            "valid_range": [
+              0.0,
+              500000000.0
+            ]
+          },
+          {
+            "name": "Ct",
+            "role": "derived",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              0.05
+            ]
+          },
+          {
+            "name": "CF",
+            "role": "derived",
+            "unit": "1",
+            "source_unit": "1",
+            "valid_range": [
+              0.0,
+              0.02
+            ]
+          },
+          {
+            "name": "S",
+            "role": "constant",
+            "unit": "m2",
+            "source_unit": "m2",
+            "valid_range": [
+              1.0,
+              1000000.0
+            ]
+          },
+          {
+            "name": "iE_deg",
+            "role": "constant",
+            "unit": "rad",
+            "source_unit": "deg",
+            "valid_range": [
+              0.0,
+              1.5707963267948966
+            ]
+          }
+        ],
+        "checks": [
+          {
+            "check_id": "dataset.finite_values",
+            "kind": "finite_values",
+            "required": true,
+            "applicability": "all recognised columns present and finite",
+            "variables": [
+              "Fn",
+              "V_kn",
+              "Rt_kN",
+              "Pe_kW",
+              "Ct",
+              "CF",
+              "S",
+              "iE_deg"
+            ]
+          },
+          {
+            "check_id": "dataset.units_resolvable",
+            "kind": "unit_consistency",
+            "required": true,
+            "applicability": "declared source unit convertible to canonical SI unit",
+            "variables": [
+              "Fn",
+              "V_kn",
+              "Rt_kN",
+              "Pe_kW",
+              "Ct",
+              "CF",
+              "S",
+              "iE_deg"
+            ]
+          },
+          {
+            "check_id": "dataset.physical_bounds",
+            "kind": "physical_bounds",
+            "required": true,
+            "applicability": "canonical SI values inside declared sanity range",
+            "variables": [
+              "Fn",
+              "V_kn",
+              "Rt_kN",
+              "Pe_kW",
+              "Ct",
+              "CF",
+              "S",
+              "iE_deg"
+            ]
+          },
+          {
+            "check_id": "dataset.axis_monotonic.Fn",
+            "kind": "monotonic_axis",
+            "required": true,
+            "applicability": "rows ordered by the independent variable",
+            "variables": [
+              "Fn"
+            ]
+          }
+        ],
+        "rights_policy": "allow_internal_restricted",
+        "notes": {
+          "generated_by": "tensordata.quality.fields.build_profile",
+          "unknown_columns": [],
+          "unit_conflict_columns": []
+        }
+      },
+      "report": {
+        "schema_version": "0.1.0",
+        "product_id": "physics-dataset-validator",
+        "product_version": "1.0.0",
+        "run_id": "pdv-355786ea47c598d4",
+        "created_at": "2026-11-16T04:45:43+00:00",
+        "input_refs": [
+          "/srv/tensor/agent/work/m22924/examples/pv-demo/demo-resistance.csv",
+          "/srv/tensor/agent/work/m22924/artifacts/pv-demo/docs-fixture/repeat1/demo-resistance.profile.json"
+        ],
+        "input_fingerprints": {
+          "dataset_sha256": "355786ea47c598d4b9ad3afc3a891b29797accf6916e44c3f1150dc6e442a57b",
+          "profile_sha256": "f291e8335ce5f8e0c8c880f1764c26a89403de72dcf6f75ddd3d196b929e412a"
+        },
+        "checks": [
+          {
+            "check_id": "dataset.finite_values",
+            "version": "1.0.0",
+            "method": "deterministic_rule",
+            "state": "passed",
+            "required": true,
+            "details": "All 6 rows contain finite numeric values for ['Fn', 'V_kn', 'Rt_kN', 'Pe_kW', 'Ct', 'CF', 'S', 'iE_deg']."
+          },
+          {
+            "check_id": "dataset.units_resolvable",
+            "version": "1.0.0",
+            "method": "deterministic_rule",
+            "state": "passed",
+            "required": true,
+            "details": "Compatible units; conversion will be applied to range checks: V_kn (knot -> m/s), Rt_kN (kn -> N), Pe_kW (kw -> W), iE_deg (deg -> rad)"
+          },
+          {
+            "check_id": "dataset.physical_bounds",
+            "version": "1.0.0",
+            "method": "deterministic_rule",
+            "state": "passed",
+            "required": true,
+            "details": "All selected values satisfy declared valid_range."
+          },
+          {
+            "check_id": "dataset.axis_monotonic.Fn",
+            "version": "1.0.0",
+            "method": "deterministic_rule",
+            "state": "passed",
+            "required": true,
+            "details": "Axis Fn is strictly increasing after collapsing adjacent repeats."
+          }
+        ],
+        "findings": [],
+        "evidence_refs": [
+          "file:sha256:355786ea47c598d4b9ad3afc3a891b29797accf6916e44c3f1150dc6e442a57b"
+        ],
+        "overall_status": "passed",
+        "summary": {
+          "row_count": 6,
+          "columns": [
+            "Fn",
+            "V_kn",
+            "Rt_kN",
+            "Pe_kW",
+            "Ct",
+            "CF",
+            "S",
+            "iE_deg"
+          ],
+          "rights_status": "unknown",
+          "unit_conversions": {
+            "Fn": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "V_kn": {
+              "source_unit": "knot",
+              "target_unit": "m/s"
+            },
+            "Rt_kN": {
+              "source_unit": "kn",
+              "target_unit": "N"
+            },
+            "Pe_kW": {
+              "source_unit": "kw",
+              "target_unit": "W"
+            },
+            "Ct": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "CF": {
+              "source_unit": "1",
+              "target_unit": "1"
+            },
+            "S": {
+              "source_unit": "m2",
+              "target_unit": "m2"
+            },
+            "iE_deg": {
+              "source_unit": "deg",
+              "target_unit": "rad"
+            }
+          }
+        },
+        "provenance": {
+          "input_fingerprints": {
+            "dataset_sha256": "355786ea47c598d4b9ad3afc3a891b29797accf6916e44c3f1150dc6e442a57b",
+            "profile_sha256": "f291e8335ce5f8e0c8c880f1764c26a89403de72dcf6f75ddd3d196b929e412a"
+          }
+        }
+      },
+      "timing_seconds": {
+        "identify": 0.0009255297482013702,
+        "validate": 0.0010039601475000381,
+        "total": 0.003425959497690201
+      }
+    }
+  ],
+  "injections": [
+    {
+      "case": "out_of_range_value",
+      "injection": "Rt_kN x100",
+      "verdict": "failed",
+      "detected": true,
+      "channel": "dataset.physical_bounds",
+      "failed_checks": [
+        "dataset.physical_bounds"
+      ],
+      "closure_implied_density": {
+        "mean": 102499.99898121641,
+        "relative_spread": 1.1888258816807841e-07,
+        "inside_window": false
+      },
+      "closure_detected": true
+    },
+    {
+      "case": "moderate_scale_error",
+      "injection": "Rt_kN x10",
+      "verdict": "passed",
+      "detected": false,
+      "channel": "dataset.physical_bounds",
+      "failed_checks": [],
+      "closure_implied_density": {
+        "mean": 10249.999898121643,
+        "relative_spread": 1.1888258799061601e-07,
+        "inside_window": false
+      },
+      "closure_detected": true
+    },
+    {
+      "case": "unit_mislabel_in_profile",
+      "injection": "V_kn -> kn",
+      "verdict": "failed",
+      "detected": true,
+      "channel": "dataset.units_resolvable",
+      "failed_checks": [
+        "dataset.units_resolvable"
+      ]
+    },
+    {
+      "case": "unknown_column_gate",
+      "injection": "CF -> XX_mystery",
+      "verdict": "failed",
+      "detected": true,
+      "channel": "unknown_rate_gate",
+      "unknown_rate": 0.125,
+      "unknown_rate_limit": 0.1
+    },
+    {
+      "case": "non_finite_cell",
+      "injection": "Ct row 1 blank",
+      "verdict": "failed",
+      "detected": true,
+      "channel": "dataset.finite_values",
+      "failed_checks": [
+        "dataset.finite_values"
+      ]
+    }
+  ],
+  "timing": {
+    "repeats": [
+      {
+        "repeat": 1,
+        "wall_total": 0.009347129613161087,
+        "identify": 0.0009255297482013702,
+        "validate": 0.0010039601475000381
+      }
+    ],
+    "wall_median": 0.009347129613161087,
+    "wall_min": 0.009347129613161087,
+    "wall_max": 0.009347129613161087,
+    "files": 1
+  },
+  "automation": {
+    "numeric_columns": 8,
+    "identified_columns": 8,
+    "review_required_columns": 4,
+    "cli_interventions_required": 0,
+    "manual_profile_fields_written": 0
+  },
+  "result_digest": "d8bc706997f308e1764f859b66f569a5fe9f0e26525cfc685e32dff62621fdfe",
+  "command": "python3 scripts/pv_demo.py"
+}

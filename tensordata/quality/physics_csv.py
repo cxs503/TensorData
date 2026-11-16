@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from .units import compatible, convert_value, get_unit
+from .version import PRODUCT_ID, PRODUCT_VERSION, REPORT_SCHEMA_VERSION
 
 SUPPORTED_CHECKS = {
     "finite_values",
@@ -305,9 +306,9 @@ def validate_physics_csv(
     required_unresolved = any(c["required"] and c["state"] in {"inconclusive", "not_measured"} for c in checks_out)
     overall = "failed" if required_failed else "inconclusive" if required_unresolved else "passed"
     return {
-        "schema_version": "0.1.0",
-        "product_id": "physics-dataset-validator",
-        "product_version": "0.1.0",
+        "schema_version": REPORT_SCHEMA_VERSION,
+        "product_id": PRODUCT_ID,
+        "product_version": PRODUCT_VERSION,
         "run_id": f"pdv-{digest[:16]}",
         "created_at": now,
         "input_refs": [str(source.resolve()), str(profile_file.resolve())],
